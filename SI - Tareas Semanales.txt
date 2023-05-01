@@ -1,0 +1,57 @@
+SEMANA 5 --------------------------------------
+
+ En esta primera parte se pide alcanzar una modificación del ejemplo de robot domestico que ya se ha presentado en las clases precedentes. 
+ En esta primera versión tendremos varios agentes supermercado, varios agentes owner y posiblemente varios agentes robot. 
+
+    Los agentes supermercado intentarán maximizar sus beneficios compitiendo/colaborando entre sí, mediante la atención a los 
+	pedidos que reciban de los agentes robot (y owner en su caso)
+    Los agentes robot (y en su caso el resto de robots especializados) tienen como objetivo principal satisfacer las peticiones 
+	del (de los) agente(s) owner, junto con una gestión adecuada de la casa (stock en el frigorífico, casa libre de latas vacías, ...)
+    Los agentes owner quieren satisfacer su necesidad de cerveza y también mantener conversaciones adecuadas que les distraiga adecuadamente.
+
+SEMANA 6 --------------------------------------
+
+El objetivo de esta semana es conseguir que: 
+
+    Los agentes supermarket compitan por los pedidos del robot; para ello no solo pueden ofrecer precios más bajos, 
+	también pueden ofrecer una entrega más rápida, cerveza de mejor calidad, ...
+    Los agentes owner y robot colaboren en el reciclado de las latas y en la obtención de cerveza (para beber y/o para reponer el frigorífico)
+
+SEMANA 7 -------------------------------------- 
+
+El objetivo de esta semana es conseguir que: 
+
+    El agente robot sea proactivo en la gestión de cervezas (pedidos y peticiones del usuario) de manera que no espere a 
+	la petición del agente owner, ni a que el frigorífico se quede sin cervezas
+    Transformar el agente robot en una constelación de agentes especializados controlados por dicho agente. 
+	Estos nuevos agentes pueden ser incorporados durante la ejecución del sistema en cualquier momento 
+	(OJO esto implica que los objetivos del agente robot "van a cambiar" dinámicamente)
+
+SEMANA 8 ---------------------------------------
+
+La primera parte del proyecto consiste en desarrollar el ejemplo del robot doméstico de forma que los agentes robot / owner 
+(siguiendo alguna de las estrategias vistas en clase => colaborativa, cooperativa, coordinada o competitiva) implementen 
+como nuevo objetivo la recogida de latas y su eliminación en un cubo de reciclado que debe vaciarse definitivamente 
+(recogida de basura por parte de un agente adecuado) cuando se encuentra lleno. 
+
+Además el nuevo código contará con varios supermercados que compiten por vender cerveza y ganar dinero con ello 
+(habrá que tener en cuenta que las cervezas también tienen un coste para el agente supermarket) Inicialmente cada supermarket 
+cuenta con una cantidad de dinero diferente para la adquisición de mercancías. 
+
+Tened en cuenta que para poder realizar los pedidos, el agente robot debe poder manejar una cantidad de dinero que será 
+proporcionada por owner  y que debe tener la restricción de que no puede comprar cervezas por un valor superior al del dinero 
+que tenga => puede presentar un conflicto con el objetivo de servir cerveza al owner que debe ser gestionado adecuadamente.
+
+Otro aspecto a tener en cuenta, es que (heredado del proyecto original) cuando el agente owner se aburra, puede solicitar 
+la hora o intentar conversar (intercambio de mensajes) con el agente robot. 
+
+SEMANA 9 ---------------------------------------
+
+En el entorno se añada un lavavajillas 
+En el frigorífico  además de latas de cerveza de varias marcas (tipos), contaremos con platos con pinchitos de distinto tipo
+El agente owner solicitará su cerveza como hasta ahora y un pinchito para acompañar
+El agente robot será requerido para retirar el plato vacío e introducirlo en el lavavajillas
+El agente robot será el encargado de poner el lavavajillas y cuando este termine retirar los platos y colocarlos en su sitio (alacena)
+
+SEMANA 10 --------------------------------------
+
