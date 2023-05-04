@@ -26,7 +26,7 @@ too_much(B) :-
    	!buySupermarketBeer;
 	-reponerCerveza.
 
-+!bring(owner,beer) :  not available(beer,fridge) & available(pincho,mesa) <- 
++!bring(owner,beer) :  not available(beer,fridge) & available(pincho,fridge) <- 
 	!checkSupermarkets;
 	.send(repartidor, achieve, go_at(repartidor,delivery));
 	.wait(500);
@@ -34,7 +34,7 @@ too_much(B) :-
 	.wait(50);
 	!buySupermarketBeer.
 
-+!bring(owner,beer) : available(beer,fridge) & not available(pincho,mesa) <-
++!bring(owner,beer) : available(beer,fridge) & not available(pincho,fridge) <-
    	siguienteAperitivo;
 	!checkSupermarkets;
 	.send(repartidor, achieve, go_at(repartidor,delivery));
@@ -43,7 +43,7 @@ too_much(B) :-
 	.wait(50);
 	!buySupermarketPincho.  
 
-+!bring(owner,beer) : not available(beer,fridge) & not available(pincho,mesa) <-
++!bring(owner,beer) : not available(beer,fridge) & not available(pincho,fridge) <-
    siguienteAperitivo;
    !checkSupermarkets;
    .send(repartidor, achieve, go_at(repartidor,delivery));
@@ -62,23 +62,31 @@ too_much(B) :-
    	.time(HH,NN,SS);
    	.concat("La hora es: ", HH,":",NN,":",SS, M);
    	.send(owner,tell,msg(M)).
-   
-+!bring(owner,beer) :  available(beer,fridge) & not too_much(beer) & stock(pincho,N) & N > 0 <- 
+ 
++!bring(owner,beer) : carringPlato <- 
+	.wait(100); 
+	!bring(owner,beer).		
+
++!bring(owner,beer) :  available(beer,fridge) & not too_much(beer) & available(pincho,fridge) & not carringPlato <- 
 	!go_at(robot,fridge);
 	open(fridge);
 	get(beer);
     close(fridge);
-    !go_at(robot,mesaPincho);
+    !go_at(robot,fridge);
 	get(pincho);
     !go_at(robot,owner);
     hand_in(beer);
+	+carringPlato;
+	!go_at(robot,lavavajillas);
+	anadirPlatosLavavajillas(1);
     ?has(owner,beer);
     .date(YY,MM,DD); .time(HH,NN,SS);
-    +consumed(YY,MM,DD,HH,NN,SS,beer).
+    +consumed(YY,MM,DD,HH,NN,SS,beer);
+	-carringPlato.
 
-+!bring(owner,beer) : available(beer,fridge) & not too_much(beer) & stock(pincho,N) & N = 0 <- 
-	.wait(100); 
-	!bring(owner,beer).
+-!bring(_,_) <- 
+	.current_intention(I);
+	.print("Failed to achieve goal '!has(_,_)'. Current intention is: ",I).	
 
 +!buySupermarketBeer : favBeer(Marca) & barataF(Product, Marca, Precio, Stock, Super) & cash(Dinero) & tamPackBeer(Qtd) <-
 
@@ -179,10 +187,6 @@ too_much(B) :-
 		}
 	}.
 
-//-!bring(_,_) <- 
-//	.current_intention(I);
-//	.print("Failed to achieve goal '!has(_,_)'. Current intention is: ",I).
-
 +!pay(Precio, Qtd, SuperBarato) <-
    ?cash(OldCash);
    Pago = Qtd * Precio;
@@ -195,15 +199,6 @@ too_much(B) :-
 	move_towards(P);
     !go_at(robot,P).
 
-+!recycle <-
-   .send(cocinero,achieve,recogerPlato);
-   decideRandomRecycler;
-   .send(owner,tell,robotRecycling);
-   ?recyclingAgent(Ag);
-   .send(Ag,achieve,recycle);
-   -recyclingAgent(Ag);
-   .send(owner,achieve,get(beer)).
-
 +delivered(beer,Brand,Qtd,OrderId) : available(beer,fridge) <- 
 	+available(beer,fridge);
 	-delivered(beer,Brand,Qtd,OrderId).
@@ -215,7 +210,7 @@ too_much(B) :-
 
 +delivered(Aperitivo,Qtd,OrderId) <- 
 	.send(cocinero,achieve,prepararPincho(Aperitivo));
-    +available(pincho,mesa);
+    +available(pincho,fridge);
     !bring(owner,beer);
     -delivered(Aperitivo,Qtd,OrderId).
 
@@ -226,13 +221,13 @@ too_much(B) :-
    -available(beer,fridge);
    +available(beer,fridge).
 
-+stock(pincho,0) : available(pincho,mesa) <-
-   -available(pincho,mesa);
++stock(pincho,0) : available(pincho,fridge) <-
+   -available(pincho,fridge);
    -stock(pincho,0).
 
-+stock(pincho,N) : N > 0 & not available(pincho,mesa) <-
-   -available(pincho,mesa);
-   +available(pincho,mesa);
++stock(pincho,N) : N > 0 & not available(pincho,fridge) <-
+   -available(pincho,fridge);
+   +available(pincho,fridge);
    -stock(pincho,N).
 
 +!checkSupermarkets <-
@@ -299,5 +294,14 @@ too_much(B) :-
 	.min(List, PrecioBarato);
 	?pricePincho(Product, PrecioBarato, Stock)[source(Super)];
 	+masbarato(Product, PrecioBarato, Stock, Super).
+	
++lavavajillasLleno <-
+  !go_at(robot,lavavajillas);
+  .wait(100);
+  vaciar_lavavajillas;
+  !go_at(robot,alacena);
+  .wait(100);
+  anadirPlatosAlacena(5);
+  -lavavajillasLleno.
 	
 +?time(T) <-  time.check(T).

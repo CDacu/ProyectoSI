@@ -5,7 +5,6 @@
     .wait(100);
     !go_at(cocinero,mesaPincho);
     prepararPincho(Product);
-	.wait(100);
     !go_at(cocinero,cocineroBase).
 
 +lavavajillasLleno <-

@@ -23,10 +23,22 @@
 	.send(robot, achieve, bring(owner,beer)).
 
 // if I have not beer finish and leave the empty can, in other case while I have beer, sip
-+!drink(beer) : not has(owner,beer) <- 
-	throwBeerCan;
-	.send(robot, achieve, recycle(1)).
-      
++!drink(beer) : not has(owner,beer) & not yaElegido <-
+	+yaElegid;
+	.random(X);
+	if(X > 0.5){
+		throwBeerCan;
+		.send(basurero,achieve,recycle);
+		.send(owner,achieve,get(beer));
+	}else{
+		.send(owner,achieve,recycle);
+		.send(owner,achieve,get(beer));
+	}.
+
++!drink(beer) : not has(owner,beer) & yaElegido <-
+	.wait(100);
+	!drink(beer).
+	
 +!drink(beer) <- 
 	sip(beer);
 	.println("Owner está bebiendo cerveza");
@@ -44,12 +56,6 @@
 
 +robotRecycling <- 
 	.send(robot, unachieve, bring(owner,beer)).
-
-//Función de owner que recoge latas: 
-
-+recycle <-
-    !recycle;
-    -recycle.
 
 +!recycle <-
    !go_at(owner,beercan);

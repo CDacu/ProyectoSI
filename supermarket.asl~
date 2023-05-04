@@ -9,24 +9,12 @@ last_order_id(1).
 						& precioProveedor(beer, 1906, Precio1906)
 						& precioProveedor(beer, bock, PrecioBock)
 						& precioProveedor(beer, estrella, PrecioEstrella) <-
-     .random(X);
-     .random(Y);
-     +stock(tortilla, X*5 + PrecioTortilla, Y*3);
-     .random(X1);
-     .random(Y1);
-     +stock(empanada, X1*5 + PrecioEmpanada, Y1*3);
-     .random(X2);
-     .random(Y2);
-     +stock(jamon, X2*5 + PrecioJamon, Y2*3);
-     .random(X3);
-     .random(Y3);
-     +stock(beer, 1906, X3*3 + Precio1906, Y3*5);
-     .random(X4);
-     .random(Y4);
-     +stock(beer, estrella, X4*3 + PrecioEstrella, Y4*5);
-	 .random(X5);
-     .random(Y5);
-     +stock(beer, bock, X5*3 + PrecioBock, Y5*5).
+     +stock(tortilla, 5 + PrecioTortilla, 3);
+     +stock(empanada, 5 + PrecioEmpanada, 3);
+     +stock(jamon, 5 + PrecioJamon, 3);
+     +stock(beer, 1906, 3 + Precio1906, 8);
+     +stock(beer, estrella, 3 + PrecioEstrella, 8);
+     +stock(beer, bock, 3 + PrecioBock, 8).
 
 +!randomizarPrecios : true <-
      .wait(50);
@@ -60,7 +48,7 @@ last_order_id(1).
     .concat("No queda stock de ", Product, ". El pedido realizado es de ", Qtd, " y en stock quedan: ", Stock, M);
     .send(owner, tell, msg(M)).
 
-+!reponerStock(Product) : stock(Product, _ , Qtd) & Qtd < 3 & precioProveedor(Producto, Precio) & cash(Dinero) & Dinero >= Precio <-
++!reponerStock(Product) : stock(Product, _ , Qtd) & Qtd < 3 & precioProveedor(Product, Precio) & cash(Dinero) & Dinero >= Precio <-
      -cash(Dinero);
      +cash(Dinero - Precio);
      .send(proveedor, achieve, pago(Precio));
@@ -99,13 +87,13 @@ last_order_id(1).
 
 +tellPrice[source(X)] <-
 	!tellPriceBeer;
-	!tellPricePinchos;
+	!tellPricePincho;
 	-tellPrice[source(X)].
 
 +tellPriceBeer[source(X)] <-
      !tellPriceBeer;
      -tellPriceBeer[source(X)].
 
-+tellPricePinchos[source(X)] <-
-     !tellPricePinchos;
-     -tellPricePinchos[source(X)].
++tellPricePincho[source(X)] <-
+     !tellPricePincho;
+     -tellPricePincho[source(X)].

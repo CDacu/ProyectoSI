@@ -33,13 +33,13 @@ public class HouseView extends GridWorldView {
                 g.setColor(Color.black);
 				
 				if(hmodel.pinchosTortilla > 0){
-                    o = "F: B(" + hmodel.availableBeers + ") T(" + hmodel.pinchosTortilla + ")";
+                    o = "Fridge B(" + hmodel.availableBeers + ") T(" + hmodel.pinchosTortilla + ")";
                 } else if (hmodel.pinchosEmpanada > 0){
-                    o = "F: B(" + hmodel.availableBeers + ") E(" + hmodel.pinchosEmpanada + ")";
+                    o = "Fridge B(" + hmodel.availableBeers + ") E(" + hmodel.pinchosEmpanada + ")";
                 } else if (hmodel.pinchosJamon > 0){
-                    o = "F: B(" + hmodel.availableBeers + ") J(" + hmodel.pinchosJamon + ")";
+                    o = "Fridge B(" + hmodel.availableBeers + ") J(" + hmodel.pinchosJamon + ")";
                 } else {
-                    o = "F: B(" + hmodel.availableBeers + ")";
+                    o = "Fridge B(" + hmodel.availableBeers + ")";
                 }
                 drawString(g, x, y, defaultFont, o);
                 break;
@@ -70,15 +70,15 @@ public class HouseView extends GridWorldView {
                     super.drawAgent(g, x, y, Color.yellow, -1);
                 }
                 g.setColor(Color.black);
-                drawString(g, x, y, defaultFont, "Bin(" + hmodel.cansInBin + "/5)");
+                drawString(g, x, y, defaultFont, "Bin (" + hmodel.cansInBin + ")");
                 break;
             case HouseModel.LAVAVAJILLAS:
                 super.drawAgent(g, x, y, Color.white, -1);
                 g.setColor(Color.black);
-                drawString(g, x, y, defaultFont, "PS(" + hmodel.platosEnLavavajillas + "/5)");
+                drawString(g, x, y, defaultFont, "Lava(" + hmodel.platosEnLavavajillas + ")");
                 break;
             case HouseModel.ALACENA:
-                o = "PL(" + hmodel.platosEnAlacena + "/15)";
+                o = "Alacena (" + hmodel.platosEnAlacena + ")";
                 g.setColor(Color.black);
                 drawString(g, x, y, defaultFont, o);
                 break;
@@ -149,8 +149,8 @@ public class HouseView extends GridWorldView {
                 super.drawString(g, x, y, defaultFont, o);
                 break;
             case 6:
-                Location lRepartidor = hmodel.getAgPos(6);
 				if(hmodel.repartiendo){
+                Location lRepartidor = hmodel.getAgPos(6);
                 c = new Color(0xB5F1CC);
                 super.drawAgent(g, x, y, c, -1);
                 g.setColor(Color.black);
