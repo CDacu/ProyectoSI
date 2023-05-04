@@ -17,30 +17,40 @@
 
 //Si el owner no tiene cerveza la pide
 +!get(beer) : ~couldDrink(beer) <-
+	-yaElegido;
    .println("Owner ha bebido demasiado por hoy.").
+
+/*
++!get(beer) :  not elected  <-
+	+elected;
+	.random(X);
+	if(X > 0.5){
+		!bring(owner,beer);
+	}else{
+		.send(robot, achieve, bring(owner,beer));
+	}
+	-elected.	
+*/	
 
 +!get(beer) <-
 	.send(robot, achieve, bring(owner,beer)).
 
 +!bring(owner,beer) <- 
-	+carringPlato;
-	!go_at(robot,fridge);
+	!go_at(owner,fridge);
 	open(fridge);
 	get(beer);
 	get(pincho);
 	close(fridge);
-    !go_at(robot,owner);
+    !go_at(owner,owner);
     hand_in(beer);
-	!go_at(robot,lavavajillas);
+	!go_at(owner,lavavajillas);
 	anadirPlatosLavavajillas(1);
-    //?has(owner,beer);
     .date(YY,MM,DD); .time(HH,NN,SS);
-    +consumed(YY,MM,DD,HH,NN,SS,beer);
-	-carringPlato.
+    +consumed(YY,MM,DD,HH,NN,SS,beer).
 	
 // if I have not beer finish and leave the empty can, in other case while I have beer, sip
 +!drink(beer) : not has(owner,beer) & not yaElegido <-
-	+yaElegid;
+	+yaElegido;
 	.random(X);
 	if(X > 0.5){
 		throwBeerCan;
@@ -49,7 +59,8 @@
 	}else{
 		.send(owner,achieve,recycle);
 		.send(owner,achieve,get(beer));
-	}.
+	}
+	-yaElegido.
 
 +!drink(beer) : not has(owner,beer) & yaElegido <-
 	.wait(100);

@@ -43,8 +43,7 @@ public class HouseModel extends GridWorldModel {
     Location lRepartidor    = new Location(1, GSize-1);
     Location lRobot         = new Location(GSize-1, GSize/2);
     Location lBin           = new Location(GSize-1, 0);
-    Location lBeerCan       = new Location(GSize-1, GSize/2);     // Por algún motivo el hecho de que comparta localización
-                                                                  // con el robot lo hace desaparecer
+    Location lBeerCan       = new Location(GSize-1, GSize/2);
     Location lBasurero      = new Location(GSize-1, 2);
     Location lLavavajillas  = new Location(2, 0);
     Location lAlacena       = new Location(1, 0); 
@@ -57,10 +56,12 @@ public class HouseModel extends GridWorldModel {
     Location lObstaculo3 = newObstacle();
     Location lObstaculo4 = newObstacle();
     Location lObstaculo5 = newObstacle();
+	Location lObstaculo6 = newObstacle();
+	Location lObstaculo7 = newObstacle();
 
-    Location closeTolFridge = new Location(0, 2);
-    Location closeTolOwner  = new Location(GSize-1, GSize-2);
-    Location closeTolBin    = new Location(GSize-1,1);
+    Location closeTolFridge 	= new Location(0, 2);
+    Location closeTolOwner  	= new Location(GSize-1, GSize-2);
+    Location closeTolBin    	= new Location(GSize-1,1);
 	Location closeTolAlacena = new Location(1, 1);
 
     //robot percetps
@@ -131,6 +132,8 @@ public class HouseModel extends GridWorldModel {
         add(OBSTACLE, lObstaculo3);
         add(OBSTACLE, lObstaculo4);
         add(OBSTACLE, lObstaculo5);
+		add(OBSTACLE, lObstaculo6);
+		add(OBSTACLE, lObstaculo7);
 
     }
 
@@ -143,8 +146,163 @@ public class HouseModel extends GridWorldModel {
             fridgeOpen = false;
             return true;
     }
+	
+	boolean getBeer() {
+        if (fridgeOpen && availableBeers > 0) {
+            availableBeers--;
+            carryingBeer = true;
+            if (view != null)
+                view.update(lFridge.x, lFridge.y);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    Location newObstacle() {
+    boolean addBeer(int n) {
+        availableBeers += n;
+        if (view != null)
+            view.update(lFridge.x, lFridge.y);
+        return true;
+    }
+
+    boolean handInBeer() {
+        if (carryingBeer) {
+            sipCount = 10;
+            carryingBeer = false;
+            if (view != null)
+                view.update(lOwner.x, lOwner.y);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    boolean sipBeer() {
+        if (sipCount > 0) {
+            sipCount--;
+            if (view != null)
+                view.update(lOwner.x, lOwner.y);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    boolean decideRandomRecycler() {
+        double random = Math.random();
+        if(random < 0.5) {
+            recyclingAgent = 3; //Owner
+            logger.info("Agente elegido para recoger la lata: OWNER");
+        } else {
+            recyclingAgent = 2; //Basurero
+            logger.info("Agente elegido para recoger la lata: BASURERO");
+        }
+        return true;
+    }
+
+    boolean siguienteAperitivo() {
+        double random = Math.random() * 2;  //There are 3 options
+        siguienteAperitivo = (int) random;
+        return true;
+    }
+
+    boolean quitarPlatosAlacena(int platos) {
+        platosEnAlacena = platosEnAlacena - platos;
+        return true;
+    }
+
+    boolean anadirPlatosAlacena(int platos) {
+        platosEnAlacena += platos;
+        return true;
+    }
+
+    boolean anadirPlatosLavavajillas(int platos) {
+        platosEnLavavajillas += platos;
+        return true;
+    }
+
+    boolean vaciar_lavavajillas() {
+        anadirPlatosLavavajillas(platosEnLavavajillas);
+        platosEnLavavajillas = 0;
+        return true;
+    }
+
+    boolean prepararPincho(String pincode) {
+        
+        if(pincode.equals("tortilla")) {
+            pinchosTortilla += 5;
+
+        } else if (pincode.equals("empanada")) {
+            pinchosEmpanada += 5;
+
+        } else if (pincode.equals("jamon")) {
+            pinchosJamon += 5;
+        }
+
+        return true;
+    }
+
+    boolean getPincho() {
+        if(pinchosTortilla > 0){
+            pinchosTortilla --;
+        } else if (pinchosEmpanada > 0) {
+            pinchosEmpanada --;
+        } else if (pinchosJamon > 0) {
+            pinchosJamon --;
+        }
+        return true;
+    }
+
+
+    boolean recycleCan() {
+        	cansInBin++;
+		if (view != null)
+            view.update(lBin.x, lBin.y);
+    	    return true;
+    }
+
+    boolean empty_bin() {
+        cansInBin = 0;
+        if (view != null)
+            view.update(lBin.x, lBin.y);
+        return true;
+    }
+	
+	boolean repartidorPop(){
+		repartiendo = !repartiendo;
+		return true;
+	}
+
+    boolean throwBeerCan() {
+        lBeerCan = getAgPos(1);
+        boolean notValid = true;
+        do {
+            notValid = false;
+            lBeerCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
+
+            for (Location lObs : lObstaculos) {
+                if (sameLocation(lObs, lBeerCan)) {
+                    notValid = true;
+                }
+            }
+        } while (notValid);
+        //logger.info("Beercan position settled : [" + lBeerCan.x + "," + lBeerCan.y + "]");
+        setAgPos(1, lBeerCan);
+
+        beerCanShow = true;
+
+        if (view != null)
+            view.update(lBeerCan.x, lBeerCan.y);
+        return true;
+    }
+	
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	
+	Location newObstacle() {
         Location lnewObs;
         boolean repetir;
         do {
@@ -610,159 +768,5 @@ public class HouseModel extends GridWorldModel {
         }
         return true;
     }
-
-    boolean getBeer() {
-        if (fridgeOpen && availableBeers > 0) {
-            availableBeers--;
-            carryingBeer = true;
-            if (view != null)
-                view.update(lFridge.x, lFridge.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean addBeer(int n) {
-        availableBeers += n;
-        if (view != null)
-            view.update(lFridge.x, lFridge.y);
-        return true;
-    }
-
-    boolean handInBeer() {
-        if (carryingBeer) {
-            sipCount = 10;
-            carryingBeer = false;
-            if (view != null)
-                view.update(lOwner.x, lOwner.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean sipBeer() {
-        if (sipCount > 0) {
-            sipCount--;
-            if (view != null)
-                view.update(lOwner.x, lOwner.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean decideRandomRecycler() {
-        double random = Math.random();
-        if(random < 0.5) {
-            recyclingAgent = 3; //Owner
-            logger.info("Agente elegido para recoger la lata: OWNER");
-        } else {
-            recyclingAgent = 2; //Basurero
-            logger.info("Agente elegido para recoger la lata: BASURERO");
-        }
-        return true;
-    }
-
-    boolean siguienteAperitivo() {
-        double random = Math.random() * 2;  //There are 3 options
-        siguienteAperitivo = (int) random;
-        return true;
-    }
-
-    boolean quitarPlatosAlacena(int platos) {
-        platosEnAlacena = platosEnAlacena - platos;
-        return true;
-    }
-
-    boolean anadirPlatosAlacena(int platos) {
-        platosEnAlacena += platos;
-        return true;
-    }
-
-    boolean anadirPlatosLavavajillas(int platos) {
-        platosEnLavavajillas += platos;
-        return true;
-    }
-
-    boolean vaciar_lavavajillas() {
-        anadirPlatosLavavajillas(platosEnLavavajillas);
-        platosEnLavavajillas = 0;
-        return true;
-    }
-
-    boolean prepararPincho(String pincode) {
-        
-        if(pincode.equals("tortilla")) {
-            pinchosTortilla += 5;
-
-        } else if (pincode.equals("empanada")) {
-            pinchosEmpanada += 5;
-
-        } else if (pincode.equals("jamon")) {
-            pinchosJamon += 5;
-        }
-
-        return true;
-    }
-
-    boolean getPincho() {
-        if(pinchosTortilla > 0){
-            pinchosTortilla --;
-        } else if (pinchosEmpanada > 0) {
-            pinchosEmpanada --;
-        } else if (pinchosJamon > 0) {
-            pinchosJamon --;
-        }
-        return true;
-    }
-
-
-    boolean recycleCan() {
-        	cansInBin++;
-		if (view != null)
-            view.update(lBin.x, lBin.y);
-    	    return true;
-    }
-
-    boolean empty_bin() {
-        cansInBin = 0;
-        if (view != null)
-            view.update(lBin.x, lBin.y);
-        return true;
-    }
-	
-	boolean repartidorPop(){
-		repartiendo = true;
-		return repartiendo;
-	}
-	
-	boolean repartidorUnPop(){
-		repartiendo = False;
-		return repartiendo;
-	}
-
-    boolean throwBeerCan() {
-        lBeerCan = getAgPos(1);
-        boolean notValid = true;
-        do {
-            notValid = false;
-            lBeerCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
-
-            for (Location lObs : lObstaculos) {
-                if (sameLocation(lObs, lBeerCan)) {
-                    notValid = true;
-                }
-            }
-        } while (notValid);
-        //logger.info("Beercan position settled : [" + lBeerCan.x + "," + lBeerCan.y + "]");
-        setAgPos(1, lBeerCan);
-
-        beerCanShow = true;
-
-        if (view != null)
-            view.update(lBeerCan.x, lBeerCan.y);
-        return true;
-    }
 }
+

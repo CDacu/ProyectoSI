@@ -36,7 +36,7 @@ public class HouseModel extends GridWorldModel {
 
     ArrayList<Location> lAgentes = new ArrayList<Location>();
 
-    Location lFridge        = new Location(0, 1);
+    Location lFridge        = new Location(0, 0);
     Location lOwner         = new Location(GSize-1, GSize-1);
     Location lOwnerChair    = new Location(GSize-1, GSize-1);
     Location lDelivery      = new Location(0, GSize-1);
@@ -56,10 +56,12 @@ public class HouseModel extends GridWorldModel {
     Location lObstaculo3 = newObstacle();
     Location lObstaculo4 = newObstacle();
     Location lObstaculo5 = newObstacle();
+	Location lObstaculo6 = newObstacle();
+	Location lObstaculo7 = newObstacle();
 
-    Location closeTolFridge = new Location(0, 2);
-    Location closeTolOwner  = new Location(GSize-1, GSize-2);
-    Location closeTolBin    = new Location(GSize-1,1);
+    Location closeTolFridge 	= new Location(0, 0);
+    Location closeTolOwner  	= new Location(GSize-1, GSize-2);
+    Location closeTolBin    	= new Location(GSize-1,1);
 	Location closeTolAlacena = new Location(1, 1);
 
     //robot percetps
@@ -106,8 +108,6 @@ public class HouseModel extends GridWorldModel {
         // create a 11x11 grid with seven mobile agents
         super(GSize, GSize, 7);
 
-        // initial location of robot (column 3, line 3)
-        // ag code 0 means the robot
         setAgPos(0, lRobot);
         setAgPos(1, lBeerCan);
         setAgPos(2, lBasurero);
@@ -130,6 +130,8 @@ public class HouseModel extends GridWorldModel {
         add(OBSTACLE, lObstaculo3);
         add(OBSTACLE, lObstaculo4);
         add(OBSTACLE, lObstaculo5);
+		add(OBSTACLE, lObstaculo6);
+		add(OBSTACLE, lObstaculo7);
 
     }
 
@@ -139,11 +141,161 @@ public class HouseModel extends GridWorldModel {
     }
 
     boolean closeFridge() {
-            fridgeOpen = false;
+        fridgeOpen = false;
+        return true;
+    }
+	
+	boolean getBeer() {
+        if (fridgeOpen && availableBeers > 0) {
+            availableBeers--;
+            carryingBeer = true;
+            if (view != null)
+                view.update(lFridge.x, lFridge.y);
             return true;
+        } else {
+            return false;
+        }
     }
 
-    Location newObstacle() {
+    boolean addBeer(int n) {
+        availableBeers += n;
+        if (view != null)
+            view.update(lFridge.x, lFridge.y);
+        return true;
+    }
+
+    boolean handInBeer() {
+        if (carryingBeer) {
+            sipCount = 10;
+            carryingBeer = false;
+            if (view != null)
+                view.update(lOwner.x, lOwner.y);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    boolean sipBeer() {
+        if (sipCount > 0) {
+            sipCount--;
+            if (view != null)
+                view.update(lOwner.x, lOwner.y);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    boolean decideRandomRecycler() {
+        double random = Math.random();
+        if(random < 0.5) {
+            recyclingAgent = 3; //Owner
+            logger.info("Agente elegido para recoger la lata: OWNER");
+        } else {
+            recyclingAgent = 2; //Basurero
+            logger.info("Agente elegido para recoger la lata: BASURERO");
+        }
+        return true;
+    }
+
+    boolean siguienteAperitivo() {
+        double random = Math.random() * 2;  //There are 3 options
+        siguienteAperitivo = (int) random;
+        return true;
+    }
+
+    boolean quitarPlatosAlacena(int platos) {
+        platosEnAlacena = platosEnAlacena - platos;
+        return true;
+    }
+
+    boolean anadirPlatosAlacena(int platos) {
+        platosEnAlacena += platos;
+        return true;
+    }
+
+    boolean anadirPlatosLavavajillas(int platos) {
+        platosEnLavavajillas += platos;
+        return true;
+    }
+
+    boolean vaciar_lavavajillas() {
+        anadirPlatosLavavajillas(platosEnLavavajillas);
+        platosEnLavavajillas = 0;
+        return true;
+    }
+
+    boolean prepararPincho(String pincode) {
+        
+        if(pincode.equals("tortilla")) {
+            pinchosTortilla += 5;
+
+        } else if (pincode.equals("empanada")) {
+            pinchosEmpanada += 5;
+
+        } else if (pincode.equals("jamon")) {
+            pinchosJamon += 5;
+        }
+
+        return true;
+    }
+
+    boolean getPincho() {
+        if(pinchosTortilla > 0){
+            pinchosTortilla --;
+        } else if (pinchosEmpanada > 0) {
+            pinchosEmpanada --;
+        } else if (pinchosJamon > 0) {
+            pinchosJamon --;
+        }
+        return true;
+    }
+
+
+    boolean recycleCan() {
+        	cansInBin++;
+		if (view != null)
+            view.update(lBin.x, lBin.y);
+    	    return true;
+    }
+
+    boolean empty_bin() {
+        cansInBin = 0;
+        if (view != null)
+            view.update(lBin.x, lBin.y);
+        return true;
+    }
+	
+	boolean repartidorPop(){
+		repartiendo = !repartiendo;
+		return true;
+	}
+
+    boolean throwBeerCan() {
+        lBeerCan = getAgPos(1);
+        boolean notValid = true;
+        do {
+            notValid = false;
+            lBeerCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
+
+            for (Location lObs : lObstaculos) {
+                if (sameLocation(lObs, lBeerCan)) {
+                    notValid = true;
+                }
+            }
+        } while (notValid);
+        //logger.info("Beercan position settled : [" + lBeerCan.x + "," + lBeerCan.y + "]");
+        setAgPos(1, lBeerCan);
+
+        beerCanShow = true;
+
+        if (view != null)
+            view.update(lBeerCan.x, lBeerCan.y);
+        return true;
+    }
+	
+	Location newObstacle() {
         Location lnewObs;
         boolean repetir;
         do {
@@ -158,6 +310,46 @@ public class HouseModel extends GridWorldModel {
         lObstaculos.add(lnewObs);
         return lnewObs;
     }
+	
+	boolean sameLocation(Location r1, Location r2) {
+
+        if ((r1.x - r2.x == 0) && (r1.y - r2.y == 0)) {
+            return true;
+        }
+        return false;
+    }
+	
+	boolean moveTowards(String mov, int agent) {
+		
+		Location r1 = getAgPos(agent);
+		if(mov.equals("up")){
+			r1.y--;
+		}else if(mov.equals("down")){
+			r1.y++;
+		}else if(mov.equals("left")){
+			r1.x--;
+		}else if(mov.equals("right")){
+			r1.x++;
+		}
+		
+		setAgPos(agent, r1);
+		
+		if (view != null) {
+            	view.update(lFridge.x,lFridge.y);
+           	view.update(lOwner.x,lOwner.y);
+            	view.update(lDelivery.x,lDelivery.y);
+			view.update(lBin.x,lBin.y);
+			view.update(lLavavajillas.x,lLavavajillas.y);
+        }
+        return true;
+	}
+	
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	// POR DEBAJO DE ESTO ES EL MOVE TOWARDS VIEJO--------------------------------------------------------------------------
+	
+	/*	
 
     // Comprueba si hay obstaculos a 1 de distancia en cruz
     boolean obstacleNear(Location r1) {
@@ -227,15 +419,6 @@ public class HouseModel extends GridWorldModel {
             if (sameLocation(origin, lAg)) {
                 return true;
             }
-        }
-
-        return false;
-    }
-
-    boolean sameLocation(Location r1, Location r2) {
-
-        if ((r1.x - r2.x == 0) && (r1.y - r2.y == 0)) {
-            return true;
         }
 
         return false;
@@ -609,155 +792,6 @@ public class HouseModel extends GridWorldModel {
         }
         return true;
     }
-
-    boolean getBeer() {
-        if (fridgeOpen && availableBeers > 0) {
-            availableBeers--;
-            carryingBeer = true;
-            if (view != null)
-                view.update(lFridge.x, lFridge.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean addBeer(int n) {
-        availableBeers += n;
-        if (view != null)
-            view.update(lFridge.x, lFridge.y);
-        return true;
-    }
-
-    boolean handInBeer() {
-        if (carryingBeer) {
-            sipCount = 10;
-            carryingBeer = false;
-            if (view != null)
-                view.update(lOwner.x, lOwner.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean sipBeer() {
-        if (sipCount > 0) {
-            sipCount--;
-            if (view != null)
-                view.update(lOwner.x, lOwner.y);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    boolean decideRandomRecycler() {
-        double random = Math.random();
-        if(random < 0.5) {
-            recyclingAgent = 3; //Owner
-            logger.info("Agente elegido para recoger la lata: OWNER");
-        } else {
-            recyclingAgent = 2; //Basurero
-            logger.info("Agente elegido para recoger la lata: BASURERO");
-        }
-        return true;
-    }
-
-    boolean siguienteAperitivo() {
-        double random = Math.random() * 2;  //There are 3 options
-        siguienteAperitivo = (int) random;
-        return true;
-    }
-
-    boolean quitarPlatosAlacena(int platos) {
-        platosEnAlacena = platosEnAlacena - platos;
-        return true;
-    }
-
-    boolean anadirPlatosAlacena(int platos) {
-        platosEnAlacena += platos;
-        return true;
-    }
-
-    boolean anadirPlatosLavavajillas(int platos) {
-        platosEnLavavajillas += platos;
-        return true;
-    }
-
-    boolean vaciar_lavavajillas() {
-        anadirPlatosLavavajillas(platosEnLavavajillas);
-        platosEnLavavajillas = 0;
-        return true;
-    }
-
-    boolean prepararPincho(String pincode) {
-        
-        if(pincode.equals("tortilla")) {
-            pinchosTortilla += 5;
-
-        } else if (pincode.equals("empanada")) {
-            pinchosEmpanada += 5;
-
-        } else if (pincode.equals("jamon")) {
-            pinchosJamon += 5;
-        }
-
-        return true;
-    }
-
-    boolean getPincho() {
-        if(pinchosTortilla > 0){
-            pinchosTortilla --;
-        } else if (pinchosEmpanada > 0) {
-            pinchosEmpanada --;
-        } else if (pinchosJamon > 0) {
-            pinchosJamon --;
-        }
-        return true;
-    }
-
-
-    boolean recycleCan() {
-        	cansInBin++;
-		if (view != null)
-            view.update(lBin.x, lBin.y);
-    	    return true;
-    }
-
-    boolean empty_bin() {
-        cansInBin = 0;
-        if (view != null)
-            view.update(lBin.x, lBin.y);
-        return true;
-    }
-	
-	boolean repartidorPop(){
-		repartiendo = !repartiendo;
-		return true;
-	}
-
-    boolean throwBeerCan() {
-        lBeerCan = getAgPos(1);
-        boolean notValid = true;
-        do {
-            notValid = false;
-            lBeerCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
-
-            for (Location lObs : lObstaculos) {
-                if (sameLocation(lObs, lBeerCan)) {
-                    notValid = true;
-                }
-            }
-        } while (notValid);
-        //logger.info("Beercan position settled : [" + lBeerCan.x + "," + lBeerCan.y + "]");
-        setAgPos(1, lBeerCan);
-
-        beerCanShow = true;
-
-        if (view != null)
-            view.update(lBeerCan.x, lBeerCan.y);
-        return true;
-    }
+	*/
 }
 

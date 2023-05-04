@@ -17,7 +17,32 @@
 	repartidorSeVa;
     -delivered(Aperitivo, Qtd, OrderId).
 
-+!go_at(repartidor,P) : at(repartidor,P) <- true.
-+!go_at(repartidor,P) : not at(repartidor,P) <- 
-	move_towards(P);
-    !go_at(repartidor,P).
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
+    .println("HE LLEGADO A MI DESTINO ", Destino);
+.
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX < DX <-
+    .println(MyName ,"[",MX,",",MY,"] -> ", Destino ,"[",DX,",",DY,"]");
+    move_towards(right);
+    !go_at(Destino);
+.
+
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX > DX <-
+    move_towards(left);
+    !go_at(Destino);
+.
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MY < DY <-
+    move_towards(down);
+    !go_at(Destino);
+.
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MY > DY <-
+    move_towards(up);
+    !go_at(Destino);
+.
+
++!go_at(Destino) : not position(Destino,_,_) <-
+    .println("HA SUCEDIDO UN ERROR, NO PUEDO LLEGAR A MI DESTINO ", Destino);
+.
