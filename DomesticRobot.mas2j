@@ -7,13 +7,13 @@
 MAS domestic_robot {
     environment: HouseEnv(gui) // use "nogui" as parameter to not show the GUI
     agents: 	
-			// Owners
-			owner;
-			
 			// Robots moviles
+			owner;
 		    	robot;
 			repartidor;
 			basurero;
+			
+			// Robots estáticos
 			incinerador;
 				
 			// Supermercados

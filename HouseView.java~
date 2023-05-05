@@ -36,7 +36,7 @@ public class HouseView extends GridWorldView {
                     o = "F: B(" + hmodel.availableBeers + ") T(" + hmodel.pinchosTortilla + ")";
                 } else if (hmodel.pinchosEmpanada > 0){
                     o = "F: B(" + hmodel.availableBeers + ") E(" + hmodel.pinchosEmpanada + ")";
-                } else if (hmodel.pinchoBocata > 0){
+                } else if (hmodel.pinchosBocata > 0){
                     o = "F: B(" + hmodel.availableBeers + ") J(" + hmodel.pinchosBocata + ")";
                 } else {
                     o = "F: B(" + hmodel.availableBeers + ")";
@@ -142,7 +142,11 @@ public class HouseView extends GridWorldView {
                 break;
             case 5:
                 Location lIncinerador = hmodel.getAgPos(5);
-                c = new Color(0xC0DBEA);
+				if(hmodel.quemandoBasura){
+					c = Color.red;
+				}else{
+					c = new Color(0xC0DBEA);
+				}
                 super.drawAgent(g, x, y, c, -1);
                 g.setColor(Color.black);
                 o = "Incinerador";

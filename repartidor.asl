@@ -6,8 +6,6 @@
     .wait(200);
     !go_at(repartidorBase);
 	repartidorSeVa;
-	move_towards(up);
-	move_towards(down);
     -delivered(beer, Marca, Qtd, OrderId).
 
 +delivered(Aperitivo, Qtd, OrderId) <-
@@ -17,8 +15,6 @@
     .wait(200);
     !go_at(repartidorBase);
 	repartidorSeVa;
-	move_towards(up);
-	move_towards(down);
     -delivered(Aperitivo, Qtd, OrderId).
 
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-

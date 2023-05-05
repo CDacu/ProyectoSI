@@ -11,8 +11,7 @@ too_much(B) :-
    	QtdB >= Limit.
 
 +!bring(owner,beer) :  too_much(beer) & limit(beer,L) & not healthMsg <- 
-	.concat("The Department of Health does not allow me to give you more than ", L,
-            " beers a day! I am very sorry about that!",M);
+	.concat("The Department of Health does not allow me to give you more than ", L," beers a day! I am very sorry about that!",M);
     .send(owner,tell,msg(M));
 	+healthMsg;
 	!bring(owner,beer).
@@ -81,35 +80,34 @@ too_much(B) :-
     .date(YY,MM,DD); .time(HH,NN,SS);
     +consumed(YY,MM,DD,HH,NN,SS,beer);
 	-carringPlato.
-
-+!prepararPincho(Product) <-
-    !go_at(alacena);
-    quitarPlatosAlacena(5);
-    !go_at(fridge);
-    .wait(100);
-    prepararPincho(Product).	
 	
 //-!bring(_,_) <- 
 //	.current_intention(I);
 //	.print("Failed to achieve goal '!has(_,_)'. Current intention is: ",I).	
+	
++!prepararPincho(Product) <-
+    !go_at(alacena);
+    quitarPlatosAlacena(5);
+    !go_at(fridge);
+    .wait(1000);
+    prepararPincho(Product).	
 
-+!buySupermarketBeer : favBeer(Marca) & barataF(Product, Marca, Precio, Stock, Super) & cash(Dinero) & tamPackBeer(Qtd) <-
-
++!buySupermarketBeer : favBeer(Marca) & barataF(Product, Marca, Precio, Stock, Super) & money(Dinero) & tamPackBeer(Qtd) <-
 	if(Precio * Qtd <= Dinero){	
 		if(Qtd <= Stock){												
 			.send(Super, achieve, order(Product, Marca, Qtd));
-   			!pay(Precio, Qtd, Super); 
+   			!pagar(Precio, Qtd, Super); 
 		}else{
 			Resto = Qtd - Stock;
 			?barata(Product, MarcaB, PrecioB, StockB, Super);
 			if(Stock == 0){
 				.send(Super, achieve, order(Product, MarcaB, Resto));
-				!pay(PrecioB, Resto, Super);
+				!pagar(PrecioB, Resto, Super);
 			}else{
 				.send(Super, achieve, order(Product, Marca, Stock));
-				!pay(Precio, Stock, Super);
+				!pagar(Precio, Stock, Super);
 				.send(Super, achieve, order(Product, MarcaB, Resto));
-				!pay(PrecioB, Resto, Super);
+				!pagar(PrecioB, Resto, Super);
 			}
 		}	
 	}else{
@@ -126,12 +124,12 @@ too_much(B) :-
 			}while(PrecioB * Resto > Dinero);
 			if(Resto > 0){
 				.send(Super, achieve, order(Product, Marca, CantidadMaxF));
-				!pay(Precio, CantidadMaxF, Super);
+				!pagar(Precio, CantidadMaxF, Super);
 				.send(Super, achieve, order(Product, MarcaB, Resto));
-				!pay(PrecioB, Resto, Super);
+				!pagar(PrecioB, Resto, Super);
 			}else{
 				.send(Super, achieve, order(Product, Marca, CantidadMaxF));
-				!pay(Precio, CantidadMaxF, Super);
+				!pagar(Precio, CantidadMaxF, Super);
 			}
 		}else{
 	*/
@@ -139,14 +137,14 @@ too_much(B) :-
 			if(PrecioB * Qtd <= Dinero){
 				if(Qtd <= StockB){
 					.send(SuperB, achieve, order(Product, MarcaB, Qtd));
-					!pay(PrecioB, Qtd, SuperB);
+					!pagar(PrecioB, Qtd, SuperB);
 				}else{
 					Resto = Qtd - StockB;
 					if(StockB == 0){
 						.concat("No he podido comprar más cervezas, no tengo dinero suficiente para aquellas que estan disponibles",M);
 					}else{
 						.send(SuperB, achieve, order(Product, MarcaB, Resto));
-						!pay(PrecioB, Resto, SuperB);
+						!pagar(PrecioB, Resto, SuperB);
 					}
 				}
 			}else{
@@ -157,7 +155,7 @@ too_much(B) :-
 				}while(PrecioB * CantidadMaxB > Dinero);
 				if(CantidadMaxB > 0){
 					.send(SuperB, achieve, order(Product, MarcaB, CantidadMaxB));
-					!pay(PrecioB, CantidadMaxB, SuperB).
+					!pagar(PrecioB, CantidadMaxB, SuperB).
 				}else{
 			*/
 					.concat("No he podido comprar más cervezas, me quedan: ",Dinero,"€ y la cerveza más barata cuesta: ",Precio,"€",M);
@@ -169,19 +167,19 @@ too_much(B) :-
 		}
 	}.
 
-+!buySupermarketPincho : siguienteAperitivo(Pincho) & barato(Pincho, Precio, Stock, Super) & cash(Dinero) <-
++!buySupermarketPincho : siguienteAperitivo(Pincho) & barato(Pincho, Precio, Stock, Super) & money(Dinero) <-
 
 	if(Dinero >= Precio){
 		if(Stock >= 1){
 		.send(Super, achieve, order(Pincho, 1));
-   		!pay(Precio, 1, Super);
+   		!pagar(Precio, 1, Super);
 		}
 	}else{
 		?masbarato(PinchoB, PrecioB, StockB, SuperB);
 		if(Dinero >= PrecioB){
 			if(StockB >= 1){
 				.send(SuperB, achieve, order(PinchoB, 1));
-   				!pay(PrecioB, 1, SuperB);
+   				!pagar(PrecioB, 1, SuperB);
 			}else{
 				.concat("No he podido comprar más pinchos, no tengo dinero suficiente para aquellos que estan disponibles",M);
    				.send(owner, tell, msg(M));
@@ -192,65 +190,57 @@ too_much(B) :-
 		}
 	}.
 
-+!pay(Precio, Qtd, SuperBarato) <-
-   ?cash(OldCash);
++!pagar(Precio, Qtd, SuperBarato) : money(Dinero) <-
    Pago = Qtd * Precio;
-   Cash = OldCash - Pago;
-   -+cash(Cash);
+   DineroActual = Dinero - Pago;
+   -+money(DineroActual);
    .send(SuperBarato, achieve, pago(Pago)).
 
 +delivered(beer,Marca,Qtd,OrderId) : available(beer,fridge) <- 
-	+available(beer,fridge);
 	-delivered(beer,Marca,Qtd,OrderId).
 
 +delivered(beer,Marca,Qtd,OrderId) <- 
 	+available(beer,fridge);
     !bring(owner,beer);
     -delivered(beer,Marca,Qtd,OrderId).
-
+	
 +delivered(Aperitivo,Qtd,OrderId) <-
 	!prepararPincho(Aperitivo);
     +available(pincho,fridge);
     !bring(owner,beer);
     -delivered(Aperitivo,Qtd,OrderId).
 
-+stock(beer,0) : available(beer,fridge) <- 
-	-available(beer,fridge).
-
-+stock(beer,N) :  N > 0 & not available(beer,fridge) <- 
-   -available(beer,fridge);
-   +available(beer,fridge).
-
-+stock(pincho,0) : available(pincho,fridge) <-
-   -available(pincho,fridge);
-   -stock(pincho,0).
-
-+stock(pincho,N) : N > 0 & not available(pincho,fridge) <-
-   -available(pincho,fridge);
-   +available(pincho,fridge);
-   -stock(pincho,N).
++stock(beer,N) <-
+	if(N = 0){
+	    -available(beer,fridge);
+	}else{
+		-+available(beer,fridge);
+	}
+	-stock(beer,N).
+	
++stock(pincho,N) <-
+	if(N = 0){
+	    -available(pincho,fridge);
+	}else{
+		-+available(pincho,fridge);
+	}
+	-stock(pincho,N).
 
 +!checkSupermarkets <-
 	.abolish(priceBeer(_,_,_,_));
 	.abolish(barataF(_,_,_,_,_));
 	.abolish(barata(_,_,_,_,_));
 	.abolish(masbarata(_,_,_,_,_));
-	.send(mercadona, tell, tellPriceBeer);
-	.send(gadis, tell, tellPriceBeer);
-
    	.abolish(pricePincho(_,_,_));
    	.abolish(barato(_,_,_,_));
-   	.send(mercadona, tell, tellPricePincho);
-	.send(gadis, tell, tellPricePincho).   
+   	.send(mercadona, tell, tellPrice);
+	.send(gadis, tell, tellPrice).   
 
 +!checkPrice <-
-	!checkPriceBeer(beer);
-	!checkPricePinchoT;
-	!checkPricePinchoE;
-	!checkPricePinchoB;
+	!checkPrice(beer);
 	!checkPricePincho.
 
-+!checkPriceBeer(Product) : favBeer(Marca) <-
++!checkPrice(Product) : favBeer(Marca) <-
 	.findall(Precio, priceBeer(Product, Marca, Precio, Stock), ListMarcaFav);
 	.min(ListMarcaFav, MenorPrecio);
 	?priceBeer(Product, Marca, MenorPrecio, Stock)[source(Super)];
@@ -271,40 +261,37 @@ too_much(B) :-
 	?priceBeer(Product, MarcaG, PrecioG, StockG)[source(gadis)];
 	+barata(Product, MarcaG, PrecioG, StockG, gadis).
 
-+!checkPricePinchoT <-
++!checkPricePincho <-
 	.findall(PrecioT, pricePincho(tortilla, PrecioT, StockT), ListTortilla);
 	.min(ListTortilla, PrecioTortilla);
 	?pricePincho(tortilla, PrecioTortilla, StockT)[source(SuperT)];
-	+barato(tortilla, PrecioTortilla, StockT, SuperT).
-
-+!checkPricePinchoE <-
+	+barato(tortilla, PrecioTortilla, StockT, SuperT);
+	
 	.findall(PrecioE, pricePincho(empanada, PrecioE, StockE), ListEmpanada);
 	.min(ListEmpanada, PrecioEmpanada);
 	?pricePincho(empanada, PrecioEmpanada, StockE)[source(SuperE)];
-	+barato(empanada, PrecioEmpanada, StockE, SuperE).	
-	
-+!checkPricePinchoB <-
+	+barato(empanada, PrecioEmpanada, StockE, SuperE);	
+
 	.findall(PrecioJ, pricePincho(bocata, PrecioJ, StockJ), ListBocata);
 	.min(ListBocata, PrecioBocata);
 	?pricePincho(Bocata, PrecioBocata, StockJ)[source(SuperJ)];
-	+barato(bocata, PrecioBocata, StockJ, SuperJ).
-	
-+!checkPricePincho <-
+	+barato(bocata, PrecioBocata, StockJ, SuperJ);
+
 	.findall(Precio, pricePincho(Product, Precio, Stock), List);
 	.min(List, PrecioBarato);
 	?pricePincho(Product, PrecioBarato, Stock)[source(Super)];
 	+masbarato(Product, PrecioBarato, Stock, Super).
 	
 +lavavajillasLleno <-
-  	!go_at(robot,lavavajillas);
-	.wait(100);
+  	!go_at(lavavajillas);
+	.wait(500);
 	vaciar_lavavajillas;
 	!go_at(robot,alacena);
-	.wait(100);
+	.wait(500);
 	anadirPlatosAlacena(5);
 	-lavavajillasLleno.
 	
-+?time(T) <-  time.check(T).
++?time(T) <- time.check(T).
 
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).
