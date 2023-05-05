@@ -2,7 +2,6 @@ import jason.asSyntax.*;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 
-
 import java.util.logging.Logger;
 
 public class HouseEnv extends Environment {
@@ -15,7 +14,7 @@ public class HouseEnv extends Environment {
     public static final Literal hb = Literal.parseLiteral("hand_in(beer)");
     public static final Literal sb = Literal.parseLiteral("sip(beer)");
     public static final Literal hob = Literal.parseLiteral("has(owner,beer)");
-    public static final Literal rc = Literal.parseLiteral("recycleCan");
+    public static final Literal rc = Literal.parseLiteral("tirarLata");
     public static final Literal tbc = Literal.parseLiteral("throwBeerCan");
 	
 	public static final Literal clf = Literal.parseLiteral("lavavajillasLleno");
@@ -36,6 +35,8 @@ public class HouseEnv extends Environment {
 	public static final Literal posCloseLavavajillas = Literal.parseLiteral("position(lavavajillas,2,1)");
 	//public static final Literal posAlacena = Literal.parseLiteral("position(alacena,1,0)");
 	public static final Literal posCloseAlacena = Literal.parseLiteral("position(alacena,1,1)");
+	public static final Literal posRepartidorBase = Literal.parseLiteral("position(repartidorBase,1,10)");
+	public static final Literal posBasureroBase = Literal.parseLiteral("position(basureroBase,10,2)");
 	
 	
 	//LITERAL NO UTILIZADOS---------------------------------------------------------------------
@@ -45,7 +46,7 @@ public class HouseEnv extends Environment {
     public static final Literal ad = Literal.parseLiteral("at(robot,delivery)");
     public static final Literal ab = Literal.parseLiteral("at(robot,base)");
     public static final Literal abin = Literal.parseLiteral("at(robot,bin)");
-    public static final Literal abc = Literal.parseLiteral("at(robot,beercan)");
+    public static final Literal abc = Literal.parseLiteral("at(robot,can)");
 	public static final Literal alv = Literal.parseLiteral("at(robot,lavavajillas)");
 	public static final Literal alc = Literal.parseLiteral("at(robot,alacena)");
 
@@ -56,14 +57,14 @@ public class HouseEnv extends Environment {
 
     // basurero literals
     public static final Literal babin = Literal.parseLiteral("at(basurero,bin)");
-    public static final Literal babc = Literal.parseLiteral("at(basurero,beercan)");
+    public static final Literal babc = Literal.parseLiteral("at(basurero,can)");
     public static final Literal bab = Literal.parseLiteral("at(basurero,basureroBase)");
 
     // incierador literals
 
     // owner literals
     public static final Literal oabin = Literal.parseLiteral("at(owner,bin)");
-    public static final Literal oabc = Literal.parseLiteral("at(owner,beercan)");
+    public static final Literal oabc = Literal.parseLiteral("at(owner,can)");
     public static final Literal oaoc = Literal.parseLiteral("at(owner,ownerChair)");
 	
 	//LITERAL NO UTILIZADOS---------------------------------------------------------------------
@@ -104,9 +105,11 @@ public class HouseEnv extends Environment {
 			addPercept(agent, posCloseLavavajillas);
 			//addPercept(agent, posAlacena);
 			addPercept(agent, posCloseAlacena);
+			addPercept(agent, posRepartidorBase);
+			addPercept(agent, posBasureroBase);
 			
 			if(model.beerCanShow){
-				addPercept(agent, Literal.parseLiteral("position(beercan," + model.getAgPos(1).x + "," + model.getAgPos(1).y + ")"));	
+				addPercept(agent, Literal.parseLiteral("position(can," + model.getAgPos(1).x + "," + model.getAgPos(1).y + ")"));	
 			}
 			
 			addPercept(agent, Literal.parseLiteral("position(robot," + model.getAgPos(0).x + "," + model.getAgPos(0).y + ")"));
@@ -127,7 +130,7 @@ public class HouseEnv extends Environment {
         } else if (model.siguienteAperitivo == 1){
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(empanada)"));
         } else if (model.siguienteAperitivo == 2){
-            addPercept("robot", Literal.parseLiteral("siguienteAperitivo(jamon)"));
+            addPercept("robot", Literal.parseLiteral("siguienteAperitivo(bocata)"));
         }
 
         if (model.platosEnLavavajillas >= 5) {
@@ -148,8 +151,8 @@ public class HouseEnv extends Environment {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosTortilla + ")"));
         } else if (model.pinchosEmpanada > 0) {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosEmpanada + ")"));
-        } else if (model.pinchosJamon > 0) {
-            addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosJamon + ")"));
+        } else if (model.pinchosBocata > 0) {
+            addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosBocata + ")"));
         } else {
             addPercept("robot", Literal.parseLiteral("stock(pincho,0)"));
         }
@@ -188,8 +191,8 @@ public class HouseEnv extends Environment {
                 dest = model.lRobot;
             } else if (l.equals("bin")) {
                 dest = model.lBin;
-            } else if (l.equals("beercan")) {
-                dest = model.lBeerCan;
+            } else if (l.equals("can")) {
+                dest = model.lcan;
             } else if (l.equals("basureroBase")) {
                 dest = model.lBasurero;
             } else if (l.equals("ownerChair")) {
@@ -248,13 +251,14 @@ public class HouseEnv extends Environment {
                 logger.info("Failed to execute action deliverBeer!" + e);
             }
         
-        } else if (action.getFunctor().equals("empty_bin") & ag.equals("incinerador")) {
+        } else if (action.getFunctor().equals("vaciar_papelera") & ag.equals("incinerador")) {
             // wait 1 second to throw the rubbish
             try {
-                Thread.sleep(1000);
-                result = model.empty_bin();
+				model.quemandoBasura = true;
+                Thread.sleep(3000);
+                result = model.vaciar_papelera();
             } catch (Exception e) {
-                logger.info("Failed to execute action recycleCan! " + e);
+                logger.info("Failed to execute action tirarLata! " + e);
             }
 
         } else if (action.getFunctor().equals("decideRandomRecycler") & (ag.equals("robot") || ag.equals("owner"))) {
@@ -283,7 +287,7 @@ public class HouseEnv extends Environment {
             result = model.vaciar_lavavajillas();
 
         } else if (action.equals(rc) & (ag.equals("robot") || ag.equals("basurero") || ag.equals("owner"))) {
-            result = model.recycleCan();
+            result = model.tirarLata();
 
         } else if (action.equals(tbc) & ag.equals("owner")) {
             result = model.throwBeerCan();

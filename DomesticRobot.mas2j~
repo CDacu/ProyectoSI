@@ -13,7 +13,6 @@ MAS domestic_robot {
 			// Robots moviles
 		    	robot;
 			repartidor;
-			cocinero;
 			basurero;
 			incinerador;
 				

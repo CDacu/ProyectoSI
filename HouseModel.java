@@ -28,11 +28,12 @@ public class HouseModel extends GridWorldModel {
     int availableBeers = 3;             // how many beers are available
     int pinchosTortilla = 0;            // how many pinchos de Tortilla are available
     int pinchosEmpanada = 0;            // how many pinchos de Empanada are available
-    int pinchosJamon = 0;               // how many pinchos de Jamon are available
+    int pinchosBocata = 0;               // how many pinchos de Bocata are available
     int cansInBin = 0;                  // how many cans are in the rubbish bin
     int platosEnLavavajillas = 0;       // how many platos are in the Lavavajillas
     int platosEnAlacena = 15;           // how many platos are in the Alacena
 	boolean repartiendo = false;
+	boolean quemandoBasura = false;
 
     ArrayList<Location> lAgentes = new ArrayList<Location>();
 
@@ -43,7 +44,7 @@ public class HouseModel extends GridWorldModel {
     Location lRepartidor    = new Location(1, GSize-1);
     Location lRobot         = new Location(GSize-1, GSize/2);
     Location lBin           = new Location(GSize-1, 0);
-    Location lBeerCan       = new Location(GSize-1, GSize/2);
+    Location lCan       = new Location(GSize-1, GSize/2);
     Location lBasurero      = new Location(GSize-1, 2);
     Location lLavavajillas  = new Location(2, 0);
     Location lAlacena       = new Location(1, 0); 
@@ -82,13 +83,13 @@ public class HouseModel extends GridWorldModel {
 
     //basurero percepts
     boolean basureroAtBin       = false;
-    boolean robotAtBeerCan      = false;
-    boolean basureroAtBeerCan   = false;
+    boolean robotAtCan      = false;
+    boolean basureroAtCan   = false;
     boolean basureroAtBase      = false;
 
     //owner percepts
     boolean ownerAtBin          = false;
-    boolean ownerAtBeerCan      = false;
+    boolean ownerAtCan      = false;
     boolean ownerAtOwnerChair   = false;
 
     //cocinero percepts
@@ -109,7 +110,7 @@ public class HouseModel extends GridWorldModel {
         super(GSize, GSize, 7);
 
         setAgPos(0, lRobot);
-        setAgPos(1, lBeerCan);
+        setAgPos(1, lCan);
         setAgPos(2, lBasurero);
         setAgPos(3, lOwner);
         setAgPos(4, lCocinero);
@@ -234,8 +235,8 @@ public class HouseModel extends GridWorldModel {
         } else if (pincode.equals("empanada")) {
             pinchosEmpanada += 5;
 
-        } else if (pincode.equals("jamon")) {
-            pinchosJamon += 5;
+        } else if (pincode.equals("bocata")) {
+            pinchosBocata += 5;
         }
 
         return true;
@@ -246,22 +247,23 @@ public class HouseModel extends GridWorldModel {
             pinchosTortilla --;
         } else if (pinchosEmpanada > 0) {
             pinchosEmpanada --;
-        } else if (pinchosJamon > 0) {
-            pinchosJamon --;
+        } else if (pinchosBocata > 0) {
+            pinchosBocata --;
         }
         return true;
     }
 
 
-    boolean recycleCan() {
+    boolean tirarLata() {
         	cansInBin++;
 		if (view != null)
             view.update(lBin.x, lBin.y);
     	    return true;
     }
 
-    boolean empty_bin() {
+    boolean vaciar_papelera() {
         cansInBin = 0;
+		quemandoBasura = false;
         if (view != null)
             view.update(lBin.x, lBin.y);
         return true;
@@ -273,25 +275,25 @@ public class HouseModel extends GridWorldModel {
 	}
 
     boolean throwBeerCan() {
-        lBeerCan = getAgPos(1);
+        lCan = getAgPos(1);
         boolean notValid = true;
         do {
             notValid = false;
-            lBeerCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
+            lCan = new Location((int) (Math.random() * 4 + 1), (int) (Math.random() * 4 + 1));
 
             for (Location lObs : lObstaculos) {
-                if (sameLocation(lObs, lBeerCan)) {
+                if (sameLocation(lObs, lCan)) {
                     notValid = true;
                 }
             }
         } while (notValid);
-        //logger.info("Beercan position settled : [" + lBeerCan.x + "," + lBeerCan.y + "]");
-        setAgPos(1, lBeerCan);
+        //logger.info("can position settled : [" + lCan.x + "," + lCan.y + "]");
+        setAgPos(1, lCan);
 
         beerCanShow = true;
 
         if (view != null)
-            view.update(lBeerCan.x, lBeerCan.y);
+            view.update(lCan.x, lCan.y);
         return true;
     }
 	
@@ -565,7 +567,7 @@ public class HouseModel extends GridWorldModel {
         lAgentes.add(lAlacena);
         
         for (int i = 0; i < 7; i++) {
-            if (i != agent && i != 1) { // Not himself or the beerCan
+            if (i != agent && i != 1) { // Not himself or the Can
                 lAgentes.add(getAgPos(i));
             }
         }
@@ -741,9 +743,9 @@ public class HouseModel extends GridWorldModel {
         Location rIncinerador = getAgPos(5);
         setAgPos(5, rIncinerador);
 
-        if(beerCanShow) {
-            Location rBeerCan = getAgPos(1);
-            setAgPos(1, rBeerCan);
+        if(CanShow) {
+            Location rCan = getAgPos(1);
+            setAgPos(1, rCan);
         }
 
         switch (agent) {
@@ -755,16 +757,16 @@ public class HouseModel extends GridWorldModel {
 			    atLavavajillas = locationsNear(r1, lLavavajillas);
 			    atAlacena = r1.equals(closeTolAlacena);
                 robotAtBin = r1.equals(lBin);
-                robotAtBeerCan = r1.equals(lBeerCan);
+                robotAtCan = r1.equals(lCan);
                 break;
             case 2: // basurero
                 basureroAtBin = locationsNear(r1, lBin);
-                basureroAtBeerCan = r1.equals(lBeerCan);
+                basureroAtCan = r1.equals(lCan);
                 basureroAtBase = r1.equals(lBasurero);
                 break;
             case 3: // owner
                 ownerAtBin = locationsNear(r1, lBin);
-                ownerAtBeerCan = r1.equals(lBeerCan);
+                ownerAtCan = r1.equals(lCan);
                 ownerAtOwnerChair = r1.equals(lOwnerChair);
                 break;
             case 4 : //cocinero

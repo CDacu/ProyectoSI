@@ -17,9 +17,9 @@ MAS domestic_robot {
 			incinerador;
 				
 			// Supermercados
-			mercadona supermarket.asl [beliefs = "cash(10)"];
-			gadis supermarket.asl [beliefs = "cash(10)"];
-			proveedor [beliefs = "cash(20), price(beer, bock, 3), price(beer, 1906, 4), price(beer, estrella, 5), price(tortilla,13), price(empanada,15), price(jamon,8)"];
+			mercadona supermarket.asl [beliefs = "money(10)"];
+			gadis supermarket.asl [beliefs = "money(10)"];
+			proveedor [beliefs = "money(20), precio(beer, bock, 2), precio(beer, 1906, 4), precio(beer, estrella, 3), precio(tortilla,10), precio(empanada,15), precio(bocata,7)"];
 			
 			
 			

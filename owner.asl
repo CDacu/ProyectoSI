@@ -1,5 +1,5 @@
 !get(beer).
-!setCashRobot(100).
+!setMoneyRobot(100).
 !setFavBeer(1906).
 !aburrimiento.
 
@@ -9,15 +9,13 @@
 -has(owner,beer) : not robotRecycling <- 
 	!get(beer).
 
-+!setCashRobot(Qtd) : Qtd >= 0 <-
-   .send(robot, tell, cash(Qtd)).
++!setMoneyRobot(Qtd) <-
+   .send(robot, tell, money(Qtd)).
 
-+!setFavBeer(Brand) <-
-   .send(robot, tell, favBeer(Brand)).
++!setFavBeer(Marca) <-
+   .send(robot, tell, favBeer(Marca)).
 
-//Si el owner no tiene cerveza la pide
 +!get(beer) : ~couldDrink(beer) <-
-	-yaElegido;
    .println("Owner ha bebido demasiado por hoy.").
 
 /*
@@ -36,14 +34,14 @@
 	.send(robot, achieve, bring(owner,beer)).
 
 +!bring(owner,beer) <- 
-	!go_at(owner,fridge);
+	!go_at(fridge);
 	open(fridge);
 	get(beer);
 	get(pincho);
 	close(fridge);
-    !go_at(owner,owner);
+    !go_at(ownerchair);
     hand_in(beer);
-	!go_at(owner,lavavajillas);
+	!go_at(lavavajillas);
 	anadirPlatosLavavajillas(1);
     .date(YY,MM,DD); .time(HH,NN,SS);
     +consumed(YY,MM,DD,HH,NN,SS,beer).
@@ -54,10 +52,10 @@
 	.random(X);
 	if(X > 0.5){
 		throwBeerCan;
-		.send(basurero,achieve,recycle);
+		.send(basurero,achieve,recogerLata);
 		.send(owner,achieve,get(beer));
 	}else{
-		.send(owner,achieve,recycle);
+		!recogerLata;
 		.send(owner,achieve,get(beer));
 	}
 	-yaElegido.
@@ -84,14 +82,30 @@
 +robotRecycling <- 
 	.send(robot, unachieve, bring(owner,beer)).
 
-+!recycle <-
-   !go_at(owner,beercan);
-   !go_at(owner,bin);
-   recycleCan;
-   !go_at(owner,ownerChair).
++!recogerLata <-
+   !go_at(can);
+   !go_at(bin);
+   tirarLata;
+   !go_at(ownerChair).
    
-+!go_at(owner,P) : at(owner,P) <- true.
-+!go_at(owner,P) : not at(owner,P) <- 
-	move_towards(P);
-	!go_at(owner,P).
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
+    .println("HE LLEGADO A MI DESTINO ", Destino).
 
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX < DX <-
+    move_towards(right);
+    !go_at(Destino).
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX > DX <-
+    move_towards(left);
+    !go_at(Destino).
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MY < DY <-
+    move_towards(down);
+    !go_at(Destino).
+
++!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MY > DY <-
+    move_towards(up);
+    !go_at(Destino).
+
++!go_at(Destino) : not position(Destino,_,_) <-
+    .println("HA SUCEDIDO UN ERROR, NO PUEDO LLEGAR A MI DESTINO ", Destino).

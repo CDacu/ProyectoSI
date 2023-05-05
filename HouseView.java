@@ -36,8 +36,8 @@ public class HouseView extends GridWorldView {
                     o = "F: B(" + hmodel.availableBeers + ") T(" + hmodel.pinchosTortilla + ")";
                 } else if (hmodel.pinchosEmpanada > 0){
                     o = "F: B(" + hmodel.availableBeers + ") E(" + hmodel.pinchosEmpanada + ")";
-                } else if (hmodel.pinchosJamon > 0){
-                    o = "F: B(" + hmodel.availableBeers + ") J(" + hmodel.pinchosJamon + ")";
+                } else if (hmodel.pinchosBocata > 0){
+                    o = "F: B(" + hmodel.availableBeers + ") J(" + hmodel.pinchosBocata + ")";
                 } else {
                     o = "F: B(" + hmodel.availableBeers + ")";
                 }
@@ -114,12 +114,12 @@ public class HouseView extends GridWorldView {
                 }
                 break;
             case 1:
-                Location lBeerCan = hmodel.getAgPos(1);
-                if (!lBeerCan.equals(hmodel.lOwnerChair) && !lBeerCan.equals(hmodel.lFridge)) {
+                Location lCan = hmodel.getAgPos(1);
+                if (!lCan.equals(hmodel.lOwnerChair) && !lCan.equals(hmodel.lFridge)) {
                     c = Color.green;
                     super.drawAgent(g, x, y, c, -1);
                     g.setColor(Color.black);
-                    super.drawString(g, x, y, defaultFont, "BeerCan");
+                    super.drawString(g, x, y, defaultFont, "Can");
                 }
                 break;
             case 2:
@@ -142,7 +142,11 @@ public class HouseView extends GridWorldView {
                 break;
             case 5:
                 Location lIncinerador = hmodel.getAgPos(5);
-                c = new Color(0xC0DBEA);
+				if(hmodel.quemandoBasura){
+					c = Color.red;
+				}else{
+					c = new Color(0xC0DBEA);
+				}
                 super.drawAgent(g, x, y, c, -1);
                 g.setColor(Color.black);
                 o = "Incinerador";

@@ -9,14 +9,20 @@ last_order_id(1).
 						& precioProveedor(beer, 1906, Precio1906)
 						& precioProveedor(beer, bock, PrecioBock)
 						& precioProveedor(beer, estrella, PrecioEstrella) <-
-     +stock(tortilla, 5 + PrecioTortilla, 3);
-     +stock(empanada, 5 + PrecioEmpanada, 3);
-     +stock(jamon, 5 + PrecioJamon, 3);
-     +stock(beer, 1906, 3 + Precio1906, 8);
-     +stock(beer, estrella, 3 + PrecioEstrella, 8);
-     +stock(beer, bock, 3 + PrecioBock, 8).
+	.random(T);
+     +stock(tortilla, T*5 + PrecioTortilla, 3);
+	 .random(E);
+     +stock(empanada, E*5 + PrecioEmpanada, 3);
+	 .random(J);
+     +stock(jamon, J*5 + PrecioJamon, 3);
+	 .random(B1906);
+     +stock(beer, 1906, B1906*3 + Precio1906, 8);
+	 .random(BE);
+     +stock(beer, estrella, BE*3 + PrecioEstrella, 8);
+	 .random(BB);
+     +stock(beer, bock, BB*3 + PrecioBock, 8).
 
-+!randomizarPrecios : true <-
++!randomizarPrecios <-
      .wait(50);
      !randomizarPrecios.
 

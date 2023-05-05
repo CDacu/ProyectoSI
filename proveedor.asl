@@ -1,16 +1,14 @@
-!tellPriceBeer.
-!tellPricePincho.
+!tellPrice.
 
-+!tellPriceBeer <-
-	.findall(precioProveedor(Product, Marca, Price),price(Product, Marca, Price),ListaBeer);
++!tellPrice <-
+	.findall(precioBase(Beer, MarcaB, PrecioB),precio(Beer, MarcaB, PrecioB),ListaBeer);
 	.send(mercadona, tell, ListaBeer);
-	.send(gadis, tell, ListaBeer).
-
-+!tellPricePincho <-
-	.findall(precioProveedor(Product, Price),price(Product, Price), ListaPinchos);
+	.send(gadis, tell, ListaBeer);
+	
+	.findall(precioBase(Pincho, PrecioP),precio(Pincho, PrecioP), ListaPinchos);
 	.send(mercadona, tell, ListaPinchos);
 	.send(gadis, tell, ListaPinchos).
 
-+!pago(Qtd) : cash(Dinero) <-
-    -cash(Dinero);
-    +cash(Dinero+Qtd).
++!pago(Qtd) : money(Dinero) <-
+    -money(Dinero);
+    +money(Dinero+Qtd).

@@ -1,3 +1,3 @@
 +papeleraLlena <-
-	empty_bin;
+	vaciar_papelera;
 	-papeleraLlena.
