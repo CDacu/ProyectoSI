@@ -18,33 +18,8 @@
 +!get(beer) : ~couldDrink(beer) <-
    .println("Owner ha bebido demasiado por hoy.").
 
-/*
-+!get(beer) :  not elected  <-
-	+elected;
-	.random(X);
-	if(X > 0.5){
-		!bring(owner,beer);
-	}else{
-		.send(robot, achieve, bring(owner,beer));
-	}
-	-elected.	
-*/	
-
 +!get(beer) <-
 	.send(robot, achieve, bring(owner,beer)).
-
-+!bring(owner,beer) <- 
-	!go_at(fridge);
-	open(fridge);
-	get(beer);
-	get(pincho);
-	close(fridge);
-    !go_at(ownerchair);
-    hand_in(beer);
-	!go_at(lavavajillas);
-	anadirPlatosLavavajillas(1);
-    .date(YY,MM,DD); .time(HH,NN,SS);
-    +consumed(YY,MM,DD,HH,NN,SS,beer).
 	
 // if I have not beer finish and leave the empty can, in other case while I have beer, sip
 +!drink(beer) : not has(owner,beer) & not yaElegido <-
@@ -64,7 +39,7 @@
 	.wait(100);
 	!drink(beer).
 	
-+!drink(beer) <- 
++!drink(beer) : has(owner,beer) <- 
 	sip(beer);
 	.println("Owner está bebiendo cerveza");
 	!drink(beer).
@@ -86,7 +61,7 @@
    !go_at(can);
    !go_at(bin);
    tirarLata;
-   !go_at(ownerChair).
+   !go_at(ownerchair).
    
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).

@@ -2,7 +2,6 @@ import jason.asSyntax.*;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 
-
 import java.util.logging.Logger;
 
 public class HouseEnv extends Environment {
@@ -152,7 +151,7 @@ public class HouseEnv extends Environment {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosTortilla + ")"));
         } else if (model.pinchosEmpanada > 0) {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosEmpanada + ")"));
-        } else if (model.pinchoBocata > 0) {
+        } else if (model.pinchosBocata > 0) {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosBocata + ")"));
         } else {
             addPercept("robot", Literal.parseLiteral("stock(pincho,0)"));
@@ -255,7 +254,8 @@ public class HouseEnv extends Environment {
         } else if (action.getFunctor().equals("vaciar_papelera") & ag.equals("incinerador")) {
             // wait 1 second to throw the rubbish
             try {
-                Thread.sleep(1000);
+				model.quemandoBasura = true;
+                Thread.sleep(3000);
                 result = model.vaciar_papelera();
             } catch (Exception e) {
                 logger.info("Failed to execute action tirarLata! " + e);

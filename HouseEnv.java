@@ -65,7 +65,7 @@ public class HouseEnv extends Environment {
     // owner literals
     public static final Literal oabin = Literal.parseLiteral("at(owner,bin)");
     public static final Literal oabc = Literal.parseLiteral("at(owner,can)");
-    public static final Literal oaoc = Literal.parseLiteral("at(owner,ownerChair)");
+    public static final Literal oaoc = Literal.parseLiteral("at(owner,ownerchair)");
 	
 	//LITERAL NO UTILIZADOS---------------------------------------------------------------------
 
@@ -161,6 +161,11 @@ public class HouseEnv extends Environment {
             addPercept("robot", hob);
             addPercept("owner", hob);
         }
+		
+		if(model.sipCount == 0){
+			removePercept("robot", hob);
+			removePercept("owner", hob);
+		}
     }
 
     @Override
@@ -178,34 +183,6 @@ public class HouseEnv extends Environment {
 					
             String movimiento = action.getTerm(0).toString();
 			int agent = 0;
-			/*
-            Location dest = null;
-            
-            if (l.equals("fridge")) {
-                dest = model.lFridge;
-            } else if (l.equals("owner")) {
-                dest = model.lOwner;
-            } else if (l.equals("delivery")) {
-                dest = model.lDelivery;
-            } else if (l.equals("base")) {
-                dest = model.lRobot;
-            } else if (l.equals("bin")) {
-                dest = model.lBin;
-            } else if (l.equals("can")) {
-                dest = model.lcan;
-            } else if (l.equals("basureroBase")) {
-                dest = model.lBasurero;
-            } else if (l.equals("ownerChair")) {
-                dest = model.lOwnerChair;
-            } else if (l.equals("alacena"))  {
-                dest = model.closeTolAlacena;
-            } else if (l.equals("lavavajillas")) {
-                dest = model.lLavavajillas;
-            } else if (l.equals("repartidorBase")) {
-                dest = model.lRepartidor;
-            }
-
-			*/
 			
             if (ag.equals("robot")) {
                 agent = 0;

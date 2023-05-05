@@ -1,5 +1,5 @@
 !get(beer).
-!setCashRobot(100).
+!setMoneyRobot(100).
 !setFavBeer(1906).
 !aburrimiento.
 
@@ -9,13 +9,12 @@
 -has(owner,beer) : not robotRecycling <- 
 	!get(beer).
 
-+!setCashRobot(Qtd) : Qtd >= 0 <-
-   .send(robot, tell, cash(Qtd)).
++!setMoneyRobot(Qtd) <-
+   .send(robot, tell, money(Qtd)).
 
 +!setFavBeer(Marca) <-
    .send(robot, tell, favBeer(Marca)).
 
-//Si el owner no tiene cerveza la pide
 +!get(beer) : ~couldDrink(beer) <-
    .println("Owner ha bebido demasiado por hoy.").
 
@@ -56,7 +55,7 @@
 		.send(basurero,achieve,recogerLata);
 		.send(owner,achieve,get(beer));
 	}else{
-		.send(owner,achieve,recogerLata);
+		!recogerLata;
 		.send(owner,achieve,get(beer));
 	}
 	-yaElegido.
