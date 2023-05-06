@@ -132,6 +132,7 @@ public class HouseEnv extends Environment {
         } else if (model.siguienteAperitivo == 2){
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(bocata)"));
         }	
+		
 		if(model.cansInBin >= 5){
 			addPercept("incinerador",ibf);
 		}

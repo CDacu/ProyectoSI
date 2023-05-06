@@ -83,7 +83,7 @@ public class HouseView extends GridWorldView {
                 drawString(g, x, y, defaultFont, o);
                 break;
             case HouseModel.OBSTACLE: 
-                super.drawAgent(g, x, y, Color.DARK_GRAY, -1);
+                super.drawAgent(g, x, y, Color.GRAY, -1);
                 g.setColor(Color.black);
                 drawString(g, x, y, defaultFont, "Obstacle");
                 break;
@@ -116,7 +116,7 @@ public class HouseView extends GridWorldView {
             case 1:
                 Location lCan = hmodel.getAgPos(1);
                 if (!lCan.equals(hmodel.lOwnerChair) && !lCan.equals(hmodel.lFridge)) {
-                    c = Color.green;
+                    c = new Color(0xDF3A3D);
                     super.drawAgent(g, x, y, c, -1);
                     g.setColor(Color.black);
                     super.drawString(g, x, y, defaultFont, "Can");
@@ -124,7 +124,7 @@ public class HouseView extends GridWorldView {
                 break;
             case 2:
                 Location lBasurero = hmodel.getAgPos(2);
-                c = Color.blue;
+                c = new Color(0x966AE7);
                 super.drawAgent(g, x, y, c, -1);
                 g.setColor(Color.black);
                 super.drawString(g, x, y, defaultFont, "Basurero");
@@ -143,7 +143,7 @@ public class HouseView extends GridWorldView {
 			case 4:
                 Location lRepartidor = hmodel.getAgPos(4);
 				if(hmodel.repartiendo){
-					c = new Color(0xB5F1CC);
+					c = new Color(0x24DA62);
 					super.drawAgent(g, x, y, c, -1);
 					g.setColor(Color.black);
 					o = "Repartidor";

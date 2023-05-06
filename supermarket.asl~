@@ -1,13 +1,13 @@
+// ----------------------- CREENCIAS SUPERMERCADO ----------------------------------------------------------//
+
 last_order_id(1).
+
+// ----------------------- FUNCIONES INICIALES ----------------------------------------------------------//
 
 !establecerPrecios.
 
-+!establecerPrecios : 	precioBase(tortilla, PrecioTortilla) 
-               			& precioBase(empanada, PrecioEmpanada) 
-						& precioBase(bocata, PrecioBocata)
-						& precioBase(beer, 1906, Precio1906)
-						& precioBase(beer, bock, PrecioBock)
-						& precioBase(beer, estrella, PrecioEstrella) <-
++!establecerPrecios : 	precioBase(tortilla, PrecioTortilla) & precioBase(empanada, PrecioEmpanada) & precioBase(bocata, PrecioBocata)
+						& precioBase(beer, 1906, Precio1906) & precioBase(beer, bock, PrecioBock) & precioBase(beer, estrella, PrecioEstrella) <-
 	.random(T);
     +stock(tortilla, T*3 + PrecioTortilla, 3);
 	.random(E);
@@ -24,6 +24,8 @@ last_order_id(1).
 +!establecerPrecios <-
      .wait(50);
      !establecerPrecios.
+	 
+// ----------------------- FUNCIONES ENTREGAR PRODUCTOS ----------------------------------------------------------//
 
 +!order(Product, Marca, Qtd) : stock(Product, Marca, Price, Stock) & Stock >= Qtd <- 
      ?last_order_id(N);
@@ -72,6 +74,8 @@ last_order_id(1).
     ?stock(Product, Price, Stock);
     .concat("No queda stock de ", Product, ". El pedido realizado es de ", Qtd, " y en stock quedan: ", Stock, M);
     .send(owner, tell, msg(M)).
+	
+// ----------------------- FUNCIONES REPONER STOCK ----------------------------------------------------------//
 
 +!reponerStock(Product, Qtd) : stock(Product, _ , Stock) & precioBase(Product, Precio) & money(Dinero) <-
 	if(Qtd > 0){
@@ -97,12 +101,16 @@ last_order_id(1).
 		}else{
 			!reponerStock(Product, Marca, Qtd-1);
 		}
-	}.	
+	}.
 
-+!pago(Qtd) : money(Dinero) <-
-     DineroActual = Dinero + Qtd;
+// ----------------------- FUNCIONES GESTIONAR DINERO ----------------------------------------------------------//	
+
++!pago(Qtd) : money(DineroIncial) <-
+     Dinero = DineroIncial + Qtd;
 	 -money(_);
-     +money(DineroActual). 
+     +money(Dinero). 
+	 
+// ----------------------- FUNCIONES COMPARTIR PRECIOS ----------------------------------------------------------//
 
 +!tellPrice(X) <-
 	.findall(priceBeer(Product, Marca, Precio, Qtd),stock(Product, Marca, Precio, Qtd),ListaBeer);

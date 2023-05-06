@@ -1,11 +1,9 @@
-// ----------------------- CREEENCIAS OWNER ----------------------------------------------------------------------------- //
+// ----------------------- FUNCIONES INCIALES --------------------------------------------------------------------------- //
 
 !get(beer).
 !setMoneyRobot(100).
 !setFavBeer(1906).
 !aburrimiento.
-
-// ----------------------- FUNCIONES INCIALES --------------------------------------------------------------------------- //
 
 +!setMoneyRobot(Qtd) <-
    	.send(robot, tell, money(Qtd)).
@@ -57,8 +55,8 @@
 // ----------------------- FUNCIONES ABURRIMIENTO ------------------------------------------------------------------------ //
 
 +!aburrimiento <- 
-	.random(X); 
-	.wait(X*5000+5000);
+	X = math.round(math.random(4000));
+	.wait(X+4000);
 	.send(robot, achieve, tellTime);
 	!aburrimiento.
 

@@ -207,12 +207,12 @@ too_much(B) :-
 
 // ----------------------- FUNCIONES GESTION DE DINERO --------------------------------------------------------------------// 	
 	
-+!pagar(Precio, Qtd, SuperBarato) : money(Dinero) <-
++!pagar(Precio, Qtd, Super) : money(DineroInicial) <-
    Pago = Qtd * Precio;
-   DineroActual = Dinero - Pago;
+   Dinero = DineroInicial - Pago;
    -money(_);
-   +money(DineroActual);
-   .send(SuperBarato, achieve, pago(Pago)).
+   +money(Dinero);
+   .send(Super, achieve, pago(Pago)).
 
 // ----------------------- FUNCIONES GESTION DE STOCK ---------------------------------------------------------------------//   
    

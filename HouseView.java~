@@ -140,6 +140,16 @@ public class HouseView extends GridWorldView {
                 }
                 super.drawString(g, x, y, defaultFont, o);
                 break;
+			case 4:
+                Location lRepartidor = hmodel.getAgPos(4);
+				if(hmodel.repartiendo){
+					c = new Color(0xB5F1CC);
+					super.drawAgent(g, x, y, c, -1);
+					g.setColor(Color.black);
+					o = "Repartidor";
+					super.drawString(g, x, y, defaultFont, o);
+				}
+                break;
             case 5:
                 Location lIncinerador = hmodel.getAgPos(5);
 				if(hmodel.quemandoBasura){
@@ -151,16 +161,6 @@ public class HouseView extends GridWorldView {
                 g.setColor(Color.black);
                 o = "Incinerador";
                 super.drawString(g, x, y, defaultFont, o);
-                break;
-            case 6:
-                Location lRepartidor = hmodel.getAgPos(6);
-				if(hmodel.repartiendo){
-                c = new Color(0xB5F1CC);
-                super.drawAgent(g, x, y, c, -1);
-                g.setColor(Color.black);
-                o = "Repartidor";
-                super.drawString(g, x, y, defaultFont, o);
-				}
                 break;
         }
     }

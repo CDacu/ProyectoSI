@@ -6,12 +6,8 @@ last_order_id(1).
 
 !establecerPrecios.
 
-+!establecerPrecios : 	precioBase(tortilla, PrecioTortilla) 
-               			& precioBase(empanada, PrecioEmpanada) 
-						& precioBase(bocata, PrecioBocata)
-						& precioBase(beer, 1906, Precio1906)
-						& precioBase(beer, bock, PrecioBock)
-						& precioBase(beer, estrella, PrecioEstrella) <-
++!establecerPrecios : 	precioBase(tortilla, PrecioTortilla) & precioBase(empanada, PrecioEmpanada) & precioBase(bocata, PrecioBocata)
+						& precioBase(beer, 1906, Precio1906) & precioBase(beer, bock, PrecioBock) & precioBase(beer, estrella, PrecioEstrella) <-
 	.random(T);
     +stock(tortilla, T*3 + PrecioTortilla, 3);
 	.random(E);
@@ -109,10 +105,10 @@ last_order_id(1).
 
 // ----------------------- FUNCIONES GESTIONAR DINERO ----------------------------------------------------------//	
 
-+!pago(Qtd) : money(Dinero) <-
-     DineroActual = Dinero + Qtd;
++!pago(Qtd) : money(DineroIncial) <-
+     Dinero = DineroIncial + Qtd;
 	 -money(_);
-     +money(DineroActual). 
+     +money(Dinero). 
 	 
 // ----------------------- FUNCIONES COMPARTIR PRECIOS ----------------------------------------------------------//
 
