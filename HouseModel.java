@@ -38,21 +38,19 @@ public class HouseModel extends GridWorldModel {
 	boolean quemandoBasura = false; 
     boolean beerCanShow = false;
 
-    ArrayList<Location> lAgentes = new ArrayList<Location>();
-
     Location lFridge        = new Location(0, 0);
     Location lOwner         = new Location(GSize-1, GSize-1);
     Location lOwnerChair    = new Location(GSize-1, GSize-1);
     Location lDelivery      = new Location(0, GSize-1);
     Location lRepartidor    = new Location(1, GSize-1);
     Location lRobot         = new Location(GSize-1, GSize/2);
-    Location lBin           = new Location(GSize-1, 0);
+    Location lBin           = new Location(GSize-3, 0);
     Location lCan       	   = new Location(GSize-1, GSize/2);
-    Location lBasurero      = new Location(GSize-1, 2);
+    Location lBasurero      = new Location(GSize-1, 0);
     Location lLavavajillas  = new Location(2, 0);
     Location lAlacena       = new Location(1, 0); 
     Location lCocinero      = new Location(0, 2);
-    Location lIncinerador   = new Location(GSize - 2, 0);
+    Location lIncinerador   = new Location(GSize - 4, 0);
 
     ArrayList<Location> lObstaculos = new ArrayList<Location>();
     Location lObstaculo1 = newObstacle();
@@ -223,8 +221,13 @@ public class HouseModel extends GridWorldModel {
         return true;
     }
 	
-	boolean repartidorPop(){
-		repartiendo = !repartiendo;
+	boolean repartidorLlega(){
+		repartiendo = true;
+		return true;
+	}
+	
+	boolean repartidorSeVa(){
+		repartiendo = false;
 		return true;
 	}
 
@@ -275,25 +278,49 @@ public class HouseModel extends GridWorldModel {
         return false;
     }
 	
+	int getObstaculoPosX (int obstaculo) {
+		return lObstaculos.get(obstaculo).x;
+	}
+	
+	int getObstaculoPosY (int obstaculo) {
+		return lObstaculos.get(obstaculo).y;
+	}
+	
 	boolean moveTowards(String mov, int agent) {
 		
 		Location r1 = getAgPos(agent);
 		if(mov.equals("up")){
-			r1.y--;
+			if(r1.y == 0){
+				return false;
+			}else{
+				r1.y--;
+			}	
 		}else if(mov.equals("down")){
-			r1.y++;
+			if(r1.y == 10){
+				return false;
+			}else{
+				r1.y++;
+			}	
 		}else if(mov.equals("left")){
-			r1.x--;
+			if(r1.x == 0){
+				return false;
+			}else{
+				r1.x--;
+			}	
 		}else if(mov.equals("right")){
-			r1.x++;
+			if(r1.x == 10){
+				return false;
+			}else{
+				r1.x++;
+			}	
 		}
 		
 		setAgPos(agent, r1);
 		
 		if (view != null) {
-            	view.update(lFridge.x,lFridge.y);
+            view.update(lFridge.x,lFridge.y);
            	view.update(lOwner.x,lOwner.y);
-            	view.update(lDelivery.x,lDelivery.y);
+            view.update(lDelivery.x,lDelivery.y);
 			view.update(lBin.x,lBin.y);
 			view.update(lLavavajillas.x,lLavavajillas.y);
 			view.update(lRepartidor.x, lRepartidor.y);

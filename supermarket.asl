@@ -31,9 +31,25 @@ last_order_id(1).
      -+last_order_id(OrderId);
      -stock(Product, Marca, Price, Stock);
      +stock(Product, Marca, Price, Stock-Qtd);
-     .send(repartidor, tell, delivered(Product, Marca, Qtd, OrderId));
+     .send(repartidor, achieve, delivered(Product, Marca, Qtd, OrderId));
 	 if(Stock < 2){
      	!reponerStock(Product, Marca, 3);
+	 }.
+	 
++!order(Product, Marca, Qtd, MarcaB, QtdB) : stock(Product, Marca, Price, Stock) & Stock >= Qtd & stock(Product, MarcaB, PriceB, StockB) & StockB >= QtdB <- 
+     ?last_order_id(N);
+     OrderId = N + 1;
+     -+last_order_id(OrderId);
+     -stock(Product, Marca, Price, Stock);
+     +stock(Product, Marca, Price, Stock-Qtd);
+	 -stock(Product, MarcaB, PriceB, StockB);
+     +stock(Product, MarcaB, PriceB, StockB-QtdB);
+     .send(repartidor, achieve, delivered(Product, Marca, Qtd, OrderId));
+	 if(Stock < 2){
+     	!reponerStock(Product, Marca, 3);
+	 }
+	 if(StockB < 2){
+     	!reponerStock(Product, MarcaB, 3);
 	 }.
 
 +!order(Product,Qtd) : stock(Product, Price, Stock) & Stock >= Qtd <- 
@@ -42,7 +58,7 @@ last_order_id(1).
      -+last_order_id(OrderId);
      -stock(Product, Price, Stock);
      +stock(Product, Price, Stock-Qtd);
-     .send(repartidor, tell, delivered(Product, Qtd, OrderId));
+     .send(repartidor, achieve, delivered(Product, Qtd, OrderId));
 	 if(Stock < 2){
 	 	!reponerStock(Product, 3);
 	 }.   
@@ -85,7 +101,8 @@ last_order_id(1).
 
 +!pago(Qtd) : money(Dinero) <-
      DineroActual = Dinero + Qtd;
-     -+money(DineroActual). 
+	 -money(_);
+     +money(DineroActual). 
 
 +!tellPrice(X) <-
 	.findall(priceBeer(Product, Marca, Precio, Qtd),stock(Product, Marca, Precio, Qtd),ListaBeer);

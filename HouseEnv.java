@@ -23,16 +23,33 @@ public class HouseEnv extends Environment {
 	public static final Literal rll = Literal.parseLiteral("repartidorLlega");
 	public static final Literal rsv = Literal.parseLiteral("repartidorSeVa");
 	
+	// Posiciones que los agentes pueden atravesar
 	public static final Literal posCloseFridge = Literal.parseLiteral("position(fridge,0,1)");
-	public static final Literal posOwnerChair = Literal.parseLiteral("position(ownerchair,10,10)");
 	public static final Literal posCloseOwnerChair = Literal.parseLiteral("position(closeownerchair,10,9)");
-	public static final Literal posDelivery = Literal.parseLiteral("position(delivery,0,10)");
-	public static final Literal posCloseBin = Literal.parseLiteral("position(bin,10,1)");
+	public static final Literal posCloseBin = Literal.parseLiteral("position(bin,8,1)");
 	public static final Literal posCloseLavavajillas = Literal.parseLiteral("position(lavavajillas,2,1)");
 	public static final Literal posCloseAlacena = Literal.parseLiteral("position(alacena,1,1)");
+	
+	//Solo el owner puede atravesar esta posicion
+	public static final Literal posOwnerChair = Literal.parseLiteral("position(ownerchair,10,10)");
+	public static final Literal posOwnerChairObs = Literal.parseLiteral("position(obstaculo,10,10)");
+	
+	//Solo el repartidor puede atravesar esta posicion
+	public static final Literal posDelivery = Literal.parseLiteral("position(delivery,0,10)");
+	public static final Literal posDeliveryObs = Literal.parseLiteral("position(obstaculo,0,10)");
 	public static final Literal posRepartidorBase = Literal.parseLiteral("position(repartidorBase,1,10)");
-	public static final Literal posBasureroBase = Literal.parseLiteral("position(basureroBase,10,2)");
-	public static final Literal posIncinerador = Literal.parseLiteral("position(incinerador,9,0)");
+	public static final Literal posRepartidorBaseObs = Literal.parseLiteral("position(obstaculo,1,10)");
+	
+	//Solo el basurero puede atravesar esta posicion
+	public static final Literal posBasureroBase = Literal.parseLiteral("position(basureroBase,10,0)");
+	public static final Literal posBasureroBaseObs = Literal.parseLiteral("position(obstaculo,10,0)");
+	                                                                                  
+	// Posiciones no atravesables
+	public static final Literal posFridge = Literal.parseLiteral("position(obstaculo,0,0)");
+	public static final Literal posIncinerador = Literal.parseLiteral("position(obstaculo,7,0)");
+	public static final Literal posAlacena = Literal.parseLiteral("position(obstaculo,1,0)");
+	public static final Literal posLavavajillas = Literal.parseLiteral("position(obstaculo,2,0)");
+	public static final Literal posBin = Literal.parseLiteral("position(obstaculo,8,0)");  
 
     static Logger logger = Logger.getLogger(HouseEnv.class.getName());
 
@@ -59,27 +76,55 @@ public class HouseEnv extends Environment {
 			
 			clearPercepts(agent);
 			
+			// Pos atravesables
 			addPercept(agent, posCloseFridge);
-			addPercept(agent, posOwnerChair);
 			addPercept(agent, posCloseOwnerChair);
-			addPercept(agent, posDelivery);
 			addPercept(agent, posCloseBin);
 			addPercept(agent, posCloseLavavajillas);
 			addPercept(agent, posCloseAlacena);
-			addPercept(agent, posRepartidorBase);
-			addPercept(agent, posBasureroBase);
+			
+			//Pos no atravesables
 			addPercept(agent, posIncinerador);
+			addPercept(agent, posFridge);
+			addPercept(agent, posAlacena);
+			addPercept(agent, posLavavajillas);
+			addPercept(agent, posBin);
+			
+			addPercept(agent, Literal.parseLiteral("position(robot," + model.getAgPos(0).x + "," + model.getAgPos(0).y + ")"));
 			
 			if(model.beerCanShow){
 				addPercept(agent, Literal.parseLiteral("position(can," + model.getAgPos(1).x + "," + model.getAgPos(1).y + ")"));	
 			}
 			
-			addPercept(agent, Literal.parseLiteral("position(robot," + model.getAgPos(0).x + "," + model.getAgPos(0).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(basurero," + model.getAgPos(2).x + "," + model.getAgPos(2).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(owner," + model.getAgPos(3).x + "," + model.getAgPos(3).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(repartidor," + model.getAgPos(6).x + "," + model.getAgPos(6).y + ")"));
+			
+			for(int i=0; i < 7; i++){
+				addPercept(agent, Literal.parseLiteral("position(obstaculo,"+model.getObstaculoPosX(i)+","+model.getObstaculoPosY(i)+")"));
+			}
 		}
-
+		
+		addPercept("robot", posOwnerChairObs);
+		addPercept("basurero", posOwnerChairObs);
+		addPercept("repartidor", posOwnerChairObs);
+		addPercept("owner", posOwnerChair);
+			
+		addPercept("robot", posDeliveryObs);
+		addPercept("owner", posDeliveryObs);
+		addPercept("basurero", posDeliveryObs);
+		addPercept("repartidor", posDelivery);
+		
+		addPercept("robot", posRepartidorBaseObs);
+		addPercept("owner", posRepartidorBaseObs);
+		addPercept("basurero", posRepartidorBaseObs);
+		addPercept("repartidor", posRepartidorBase);
+		
+		addPercept("robot", posBasureroBaseObs);
+		addPercept("owner", posBasureroBaseObs);
+		addPercept("basurero", posBasureroBase);
+		addPercept("repartidor", posBasureroBaseObs);
+		
         if (model.siguienteAperitivo == 0){
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(tortilla)"));
         } else if (model.siguienteAperitivo == 1){
@@ -164,10 +209,10 @@ public class HouseEnv extends Environment {
             result = model.sipBeer();
 			
 		} else if (action.equals(rll) & ag.equals("repartidor")) {
-            result = model.repartidorPop();
+            result = model.repartidorLlega();
 			
 		} else if (action.equals(rsv) & ag.equals("repartidor")) {
-            result = model.repartidorPop();
+            result = model.repartidorSeVa();
 
         } else if (action.getFunctor().equals("deliverBeer") & (ag.equals("supermarket") || (ag.equals("robot"))
                 || (ag.equals("gadis")) || (ag.equals("mercadona")) || ag.equals("repartidor"))) {

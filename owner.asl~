@@ -6,7 +6,7 @@
 +has(owner,beer) <- 
 	!drink(beer).
 
--has(owner,beer) : not robotRecycling <- 
+-has(owner,beer) : not recogiendoLata <- 
 	!get(beer).
 
 +!setMoneyRobot(Qtd) <-
@@ -25,11 +25,17 @@
 +!drink(beer) : not has(owner,beer) & not yaElegido <-
 	+yaElegido;
 	.random(X);
-	if(X > 0.5){
+	X1 = X * 10;
+	+resultado(X1);
+	if(X1 > 5){
+		.println("El owner decide lanzar la lata");
 		throwBeerCan;
+		+recogiendoLata;
 		.send(basurero,achieve,recogerLata);
 		.send(owner,achieve,get(beer));
 	}else{
+		.println("El owner decide reciclar la lata");
+		+recogiendoLata;
 		!recogerLata;
 		.send(owner,achieve,get(beer));
 	}
@@ -54,14 +60,11 @@
 	.print("Message from ",Ag,": ",M);
 	-msg(M)[source(Ag)].
 
-+robotRecycling <- 
-	.send(robot, unachieve, bring(owner,beer)).
-
 +!recogerLata <-
-   !go_at(can);
    !go_at(bin);
    tirarLata;
-   !go_at(ownerchair).
+   !go_at(ownerchair);
+   -recogiendoLata.
    
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).

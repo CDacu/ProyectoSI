@@ -100,71 +100,36 @@ too_much(B) :-
 		}else{
 			Resto = Qtd - Stock;
 			?barata(Product, MarcaB, PrecioB, StockB, Super);
-			if(Stock == 0){
-				.send(Super, achieve, order(Product, MarcaB, Resto));
-				!pagar(PrecioB, Resto, Super);
-			}else{
+			if(Stock > 0){
 				.send(Super, achieve, order(Product, Marca, Stock));
 				!pagar(Precio, Stock, Super);
 				.send(Super, achieve, order(Product, MarcaB, Resto));
 				!pagar(PrecioB, Resto, Super);
-			}
-		}	
-	}else{
-	/*
-		CantidadMaxF = Qtd;
-		do{
-			CantidadMaxF = CantidadMaxF - 1;
-		}while(Precio * CantidadMaxF > Dinero);
-		if(CantidadMaxF > 0){
-			Resto = Qtd - CantidadMaxF;
-			?barata(Product, MarcaB, PrecioB, StockB, Super);
-			do{
-				Resto = Resto - 1;
-			}while(PrecioB * Resto > Dinero);
-			if(Resto > 0){
-				.send(Super, achieve, order(Product, Marca, CantidadMaxF));
-				!pagar(Precio, CantidadMaxF, Super);
-				.send(Super, achieve, order(Product, MarcaB, Resto));
-				!pagar(PrecioB, Resto, Super);
 			}else{
-				.send(Super, achieve, order(Product, Marca, CantidadMaxF));
-				!pagar(Precio, CantidadMaxF, Super);
+				?masbarata(Product, MarcaC, PrecioC, StockC, SuperC);
+				if(StockC >= Qtd){
+					.send(SuperC, achieve, order(Product, MarcaC, Qtd));
+					!pagar(PrecioC, Qtd, SuperC);
+				}else{
+					.concat("No he podido comprar más Cervezas, no tienen Stock Suficiente",M);
+					.send(owner, tell, msg(M));
+				}
+			}
+		}
+	}else{
+		?masbarata(Product, MarcaC, PrecioC, StockC, SuperC);
+		if(PrecioC * Qtd <= Dinero){
+			if(StockC >= Qtd){
+				.send(SuperC, achieve, order(Product, MarcaC, Qtd));
+				!pagar(PrecioC, Qtd, SuperC);
+			}else{
+				.concat("No he podido comprar más Cervezas, no tienen Stock Suficiente de aquellas que me puedo permitir",M);
+				.send(owner, tell, msg(M));
 			}
 		}else{
-	*/
-			?masbarata(Product, MarcaB, PrecioB, StockB, SuperB);
-			if(PrecioB * Qtd <= Dinero){
-				if(Qtd <= StockB){
-					.send(SuperB, achieve, order(Product, MarcaB, Qtd));
-					!pagar(PrecioB, Qtd, SuperB);
-				}else{
-					Resto = Qtd - StockB;
-					if(StockB == 0){
-						.concat("No he podido comprar más cervezas, no tengo dinero suficiente para aquellas que estan disponibles",M);
-					}else{
-						.send(SuperB, achieve, order(Product, MarcaB, Resto));
-						!pagar(PrecioB, Resto, SuperB);
-					}
-				}
-			}else{
-			/*
-				CantidadMaxB = Qtd;
-				do{
-					CantidadMaxB = CantidadMaxB - 1;
-				}while(PrecioB * CantidadMaxB > Dinero);
-				if(CantidadMaxB > 0){
-					.send(SuperB, achieve, order(Product, MarcaB, CantidadMaxB));
-					!pagar(PrecioB, CantidadMaxB, SuperB).
-				}else{
-			*/
-					.concat("No he podido comprar más cervezas, me quedan: ",Dinero,"€ y la cerveza más barata cuesta: ",Precio,"€",M);
-					.send(owner, tell, msg(M));
-			/*
-				}
-			}
-			*/
-		}
+			.concat("No he podido comprar más cerveza, me quedan: ",Dinero,"€ y la más barata cuesta: ",PrecioC*Qtd ,"€",M);
+   			.send(owner, tell, msg(M));
+		}	
 	}.
 
 +!buySupermarketPincho : siguienteAperitivo(Pincho) & barato(Pincho, Precio, Stock, Super) & money(Dinero) <-

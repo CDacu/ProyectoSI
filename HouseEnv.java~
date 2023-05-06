@@ -23,51 +23,16 @@ public class HouseEnv extends Environment {
 	public static final Literal rll = Literal.parseLiteral("repartidorLlega");
 	public static final Literal rsv = Literal.parseLiteral("repartidorSeVa");
 	
-	
-	//public static final Literal posFridge = Literal.parseLiteral("position(fridge,0,0)");
 	public static final Literal posCloseFridge = Literal.parseLiteral("position(fridge,0,1)");
 	public static final Literal posOwnerChair = Literal.parseLiteral("position(ownerchair,10,10)");
 	public static final Literal posCloseOwnerChair = Literal.parseLiteral("position(closeownerchair,10,9)");
 	public static final Literal posDelivery = Literal.parseLiteral("position(delivery,0,10)");
-	//public static final Literal posBin = Literal.parseLiteral("position(bin,10,0)");
 	public static final Literal posCloseBin = Literal.parseLiteral("position(bin,10,1)");
-	//public static final Literal posLavavajillas = Literal.parseLiteral("position(lavavajillas,2,0)");
 	public static final Literal posCloseLavavajillas = Literal.parseLiteral("position(lavavajillas,2,1)");
-	//public static final Literal posAlacena = Literal.parseLiteral("position(alacena,1,0)");
 	public static final Literal posCloseAlacena = Literal.parseLiteral("position(alacena,1,1)");
 	public static final Literal posRepartidorBase = Literal.parseLiteral("position(repartidorBase,1,10)");
 	public static final Literal posBasureroBase = Literal.parseLiteral("position(basureroBase,10,2)");
-	
-	
-	//LITERAL NO UTILIZADOS---------------------------------------------------------------------
-    // robot literals
-    public static final Literal af = Literal.parseLiteral("at(robot,fridge)");
-    public static final Literal ao = Literal.parseLiteral("at(robot,owner)");
-    public static final Literal ad = Literal.parseLiteral("at(robot,delivery)");
-    public static final Literal ab = Literal.parseLiteral("at(robot,base)");
-    public static final Literal abin = Literal.parseLiteral("at(robot,bin)");
-    public static final Literal abc = Literal.parseLiteral("at(robot,can)");
-	public static final Literal alv = Literal.parseLiteral("at(robot,lavavajillas)");
-	public static final Literal alc = Literal.parseLiteral("at(robot,alacena)");
-
-    // repartidor literals
-    public static final Literal raf = Literal.parseLiteral("at(repartidor,fridge)");
-    public static final Literal rad = Literal.parseLiteral("at(repartidor,delivery)");
-    public static final Literal rab = Literal.parseLiteral("at(repartidor,repartidorBase)");
-
-    // basurero literals
-    public static final Literal babin = Literal.parseLiteral("at(basurero,bin)");
-    public static final Literal babc = Literal.parseLiteral("at(basurero,can)");
-    public static final Literal bab = Literal.parseLiteral("at(basurero,basureroBase)");
-
-    // incierador literals
-
-    // owner literals
-    public static final Literal oabin = Literal.parseLiteral("at(owner,bin)");
-    public static final Literal oabc = Literal.parseLiteral("at(owner,can)");
-    public static final Literal oaoc = Literal.parseLiteral("at(owner,ownerchair)");
-	
-	//LITERAL NO UTILIZADOS---------------------------------------------------------------------
+	public static final Literal posIncinerador = Literal.parseLiteral("position(incinerador,9,0)");
 
     static Logger logger = Logger.getLogger(HouseEnv.class.getName());
 
@@ -94,19 +59,16 @@ public class HouseEnv extends Environment {
 			
 			clearPercepts(agent);
 			
-			//addPercept(agent, posFridge);
 			addPercept(agent, posCloseFridge);
 			addPercept(agent, posOwnerChair);
 			addPercept(agent, posCloseOwnerChair);
 			addPercept(agent, posDelivery);
-			//addPercept(agent, posBin);
 			addPercept(agent, posCloseBin);
-			//addPercept(agent, posLavavajillas);
 			addPercept(agent, posCloseLavavajillas);
-			//addPercept(agent, posAlacena);
 			addPercept(agent, posCloseAlacena);
 			addPercept(agent, posRepartidorBase);
 			addPercept(agent, posBasureroBase);
+			addPercept(agent, posIncinerador);
 			
 			if(model.beerCanShow){
 				addPercept(agent, Literal.parseLiteral("position(can," + model.getAgPos(1).x + "," + model.getAgPos(1).y + ")"));	
@@ -115,15 +77,8 @@ public class HouseEnv extends Environment {
 			addPercept(agent, Literal.parseLiteral("position(robot," + model.getAgPos(0).x + "," + model.getAgPos(0).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(basurero," + model.getAgPos(2).x + "," + model.getAgPos(2).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(owner," + model.getAgPos(3).x + "," + model.getAgPos(3).y + ")"));
-			addPercept(agent, Literal.parseLiteral("position(incinerador," + model.getAgPos(5).x + "," + model.getAgPos(5).y + ")"));		//No tiene sentido, no se mueve
 			addPercept(agent, Literal.parseLiteral("position(repartidor," + model.getAgPos(6).x + "," + model.getAgPos(6).y + ")"));
 		}
-
-        if (model.recyclingAgent == 2){
-            addPercept("robot", Literal.parseLiteral("recyclingAgent(basurero)"));
-        } else if (model.recyclingAgent == 3) {
-            addPercept("robot", Literal.parseLiteral("recyclingAgent(owner)"));
-        }
 
         if (model.siguienteAperitivo == 0){
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(tortilla)"));
@@ -131,22 +86,19 @@ public class HouseEnv extends Environment {
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(empanada)"));
         } else if (model.siguienteAperitivo == 2){
             addPercept("robot", Literal.parseLiteral("siguienteAperitivo(bocata)"));
-        }
-
+        }	
+		if(model.cansInBin >= 5){
+			addPercept("incinerador",ibf);
+		}
         if (model.platosEnLavavajillas >= 5) {
             addPercept("robot", clf);
         }
-
-        if (model.availableBeers > 0) {
-            addPercept("robot", Literal.parseLiteral("stock(beer," + model.availableBeers + ")"));
-        } else {
-            addPercept("robot", Literal.parseLiteral("stock(beer,0)"));
-        }
-        
+         
+		addPercept("robot", Literal.parseLiteral("stock(beer," + model.availableBeers + ")"));
+     
         if ( model.fridgeOpen && model.availableBeers == 1) {
             addPercept("robot", Literal.parseLiteral("reponerCerveza"));
         }
-        
         if (model.pinchosTortilla > 0) {
             addPercept("robot", Literal.parseLiteral("stock(pincho," + model.pinchosTortilla + ")"));
         } else if (model.pinchosEmpanada > 0) {
@@ -161,7 +113,6 @@ public class HouseEnv extends Environment {
             addPercept("robot", hob);
             addPercept("owner", hob);
         }
-		
 		if(model.sipCount == 0){
 			removePercept("robot", hob);
 			removePercept("owner", hob);
@@ -174,10 +125,10 @@ public class HouseEnv extends Environment {
         boolean result = false;
         if (action.equals(of) & ag.equals("robot")) { // of = open(fridge)
             result = model.openFridge();
-
+			
         } else if (action.equals(cf) & ag.equals("robot")) { // cf = close(fridge)
             result = model.closeFridge();
-
+			
         } else if (action.getFunctor().equals("move_towards")
                 & (ag.equals("robot") || ag.equals("basurero") || ag.equals("owner") || ag.equals("repartidor"))) {
 					
@@ -193,7 +144,7 @@ public class HouseEnv extends Environment {
             } else if (ag.equals("repartidor")) {
                 agent = 6;
             }
-
+			
             try {
                 result = model.moveTowards(movimiento, agent);
             } catch (Exception e) {
@@ -232,14 +183,11 @@ public class HouseEnv extends Environment {
             // wait 1 second to throw the rubbish
             try {
 				model.quemandoBasura = true;
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
                 result = model.vaciar_papelera();
             } catch (Exception e) {
                 logger.info("Failed to execute action tirarLata! " + e);
             }
-
-        } else if (action.getFunctor().equals("decideRandomRecycler") & (ag.equals("robot") || ag.equals("owner"))) {
-            result = model.decideRandomRecycler();
 
         } else if (action.getFunctor().equals("siguienteAperitivo") & ag.equals("robot")) {
             result = model.siguienteAperitivo();
