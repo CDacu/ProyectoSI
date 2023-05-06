@@ -1,4 +1,8 @@
+// ----------------------- CREENCIAS SUPERMERCADO ----------------------------------------------------------//
+
 last_order_id(1).
+
+// ----------------------- FUNCIONES INICIALES ----------------------------------------------------------//
 
 !establecerPrecios.
 
@@ -24,6 +28,8 @@ last_order_id(1).
 +!establecerPrecios <-
      .wait(50);
      !establecerPrecios.
+	 
+// ----------------------- FUNCIONES ENTREGAR PRODUCTOS ----------------------------------------------------------//
 
 +!order(Product, Marca, Qtd) : stock(Product, Marca, Price, Stock) & Stock >= Qtd <- 
      ?last_order_id(N);
@@ -72,6 +78,8 @@ last_order_id(1).
     ?stock(Product, Price, Stock);
     .concat("No queda stock de ", Product, ". El pedido realizado es de ", Qtd, " y en stock quedan: ", Stock, M);
     .send(owner, tell, msg(M)).
+	
+// ----------------------- FUNCIONES REPONER STOCK ----------------------------------------------------------//
 
 +!reponerStock(Product, Qtd) : stock(Product, _ , Stock) & precioBase(Product, Precio) & money(Dinero) <-
 	if(Qtd > 0){
@@ -97,12 +105,16 @@ last_order_id(1).
 		}else{
 			!reponerStock(Product, Marca, Qtd-1);
 		}
-	}.	
+	}.
+
+// ----------------------- FUNCIONES GESTIONAR DINERO ----------------------------------------------------------//	
 
 +!pago(Qtd) : money(Dinero) <-
      DineroActual = Dinero + Qtd;
 	 -money(_);
      +money(DineroActual). 
+	 
+// ----------------------- FUNCIONES COMPARTIR PRECIOS ----------------------------------------------------------//
 
 +!tellPrice(X) <-
 	.findall(priceBeer(Product, Marca, Precio, Qtd),stock(Product, Marca, Precio, Qtd),ListaBeer);

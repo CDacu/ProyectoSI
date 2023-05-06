@@ -107,7 +107,10 @@
 		}
 	}.
 	
-+!go_right <- move_towards(right).
++!go_right : .my_name(MyName) & position(MyName,MX, MY) & MX < 10 <- 
+	move_towards(right).
+
++!go_right <- true.
 	
 +!go_left : .my_name(MyName) & position(MyName,MX, MY) & position(obstaculo, MX-1, MY) <-
 	MY2 = MY;
@@ -130,7 +133,10 @@
 		}
 	}.
 
-+!go_left <- move_towards(left).
++!go_left : .my_name(MyName) & position(MyName,MX, MY) & MX > 0 <- 
+	move_towards(left).
+	
++!go_left <- true.
 	
 +!go_up : .my_name(MyName) & position(MyName,MX, MY) & position(obstaculo, MX, MY-1) <-
 	MX2 = MX;
@@ -153,7 +159,10 @@
 		}
 	}.
 
-+!go_up <- move_towards(up).	
++!go_up : .my_name(MyName) & position(MyName,MX, MY) & MY > 0 <- 
+	move_towards(up).	
+	
++!go_up <- true.
 	
 +!go_down : .my_name(MyName) & position(MyName,MX, MY) & position(obstaculo, MX, MY+1) <-
 	MX2 = MX;
@@ -177,7 +186,10 @@
 		}
 	}.
 	
-+!go_down <- move_towards(down).	
++!go_down : .my_name(MyName) & position(MyName,MX, MY) & MY < 10 <- 
+	move_towards(down).
+
++!go_down <- true.	
 	
 +!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) <-	
 	move_towards(right).

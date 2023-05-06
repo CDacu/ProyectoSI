@@ -10,7 +10,6 @@ public class HouseModel extends GridWorldModel {
     static Logger logger = Logger.getLogger(HouseModel.class.getName());
 
     // constants for the grid objects
-    
     public static final int ALACENA         = 8;
     public static final int FRIDGE          = 16;
     public static final int OWNERCHAIR      = 32;
@@ -22,16 +21,16 @@ public class HouseModel extends GridWorldModel {
     // the grid size
     public static final int GSize = 11;
 
-    boolean fridgeOpen = false;         // whether the fridge is open
-    boolean carryingBeer = false;       // whether the robot is carrying beer
-    int sipCount = 0;                   // how many sip the owner did
-    int availableBeers = 3;             // how many beers are available
-    int pinchosTortilla = 0;            // how many pinchos de Tortilla are available
-    int pinchosEmpanada = 0;            // how many pinchos de Empanada are available
-    int pinchosBocata = 0;              // how many pinchos de Bocata are available
-    int cansInBin = 0;                  // how many cans are in the rubbish bin
-    int platosEnLavavajillas = 0;       // how many platos are in the Lavavajillas
-    int platosEnAlacena = 15;           // how many platos are in the Alacena
+    boolean fridgeOpen = false;
+    boolean carryingBeer = false;       
+    int sipCount = 0;                   
+    int availableBeers = 3;             
+    int pinchosTortilla = 0;            
+    int pinchosEmpanada = 0;           
+    int pinchosBocata = 0;              
+    int cansInBin = 0;                 
+    int platosEnLavavajillas = 0;       
+    int platosEnAlacena = 15;           
 	int siguienteAperitivo = 0;
 	
 	boolean repartiendo = false;
@@ -45,7 +44,7 @@ public class HouseModel extends GridWorldModel {
     Location lRepartidor    = new Location(1, GSize-1);
     Location lRobot         = new Location(GSize-1, GSize/2);
     Location lBin           = new Location(GSize-3, 0);
-    Location lCan       	   = new Location(GSize-1, GSize/2);
+    Location lCan       	= new Location(GSize-1, GSize/2);
     Location lBasurero      = new Location(GSize-1, 0);
     Location lLavavajillas  = new Location(2, 0);
     Location lAlacena       = new Location(1, 0); 
@@ -63,15 +62,14 @@ public class HouseModel extends GridWorldModel {
 
     public HouseModel() {
         // create a 11x11 grid with seven mobile agents
-        super(GSize, GSize, 7);
+        super(GSize, GSize, 6);
 
         setAgPos(0, lRobot);
         setAgPos(1, lCan);
         setAgPos(2, lBasurero);
         setAgPos(3, lOwner);
-        setAgPos(4, lCocinero);
-        setAgPos(5, lIncinerador);
-        setAgPos(6, lRepartidor);
+        setAgPos(4, lRepartidor);
+		setAgPos(5, lIncinerador);
 
         // Adding agents to initial position
         add(FRIDGE, lFridge);
@@ -145,13 +143,13 @@ public class HouseModel extends GridWorldModel {
     }
 
     boolean siguienteAperitivo() {
-        double random = Math.random() * 2;  //There are 3 options
+        double random = Math.random() * 2;
         siguienteAperitivo = (int) random;
         return true;
     }
 
     boolean quitarPlatosAlacena(int platos) {
-        platosEnAlacena = platosEnAlacena - platos;
+        platosEnAlacena -= platos;
         return true;
     }
 

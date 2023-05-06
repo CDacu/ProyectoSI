@@ -143,9 +143,9 @@ public class HouseView extends GridWorldView {
             case 5:
                 Location lIncinerador = hmodel.getAgPos(5);
 				if(hmodel.quemandoBasura){
-					c = Color.red;
+					c = new Color(0xE46545);
 				}else{
-					c = new Color(0xC0DBEA);
+					c = new Color(0x6EAF79);
 				}
                 super.drawAgent(g, x, y, c, -1);
                 g.setColor(Color.black);

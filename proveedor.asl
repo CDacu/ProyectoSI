@@ -1,3 +1,5 @@
+// ----------------------- FUNCIONES INICIALES ------------------------------------------------ //
+
 !tellPrice.
 
 +!tellPrice <-
@@ -8,6 +10,8 @@
 	.findall(precioBase(Pincho, PrecioP),precio(Pincho, PrecioP), ListaPinchos);
 	.send(mercadona, tell, ListaPinchos);
 	.send(gadis, tell, ListaPinchos).
+	
+// ----------------------- FUNCIONES PAGO ------------------------------------------------------- //
 
 +!pago(Qtd) : money(Dinero) <-
     -money(Dinero);

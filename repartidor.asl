@@ -1,3 +1,5 @@
+// ----------------------- FUNCIONES ENTREGA SUMINISTROS --------------------------------------------------- //
+
 +!delivered(beer, Marca, Qtd, OrderId) : not trabajando <-	
 	+trabajando;
 	repartidorLlega;
@@ -30,7 +32,9 @@
 +!delivered(Aperitivo, Qtd, OrderId) <-
 	.wait(200);
 	!delivered(Aperitivo, Qtd, OrderId).
-    
+ 
+// ----------------------- MOVIMIENTO JASON ---------------------------------------------------------------------------------- //
+	
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).
 
@@ -161,7 +165,7 @@
 +!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) <-	
 	move_towards(right).
 	
-+!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & MX < 10 <- 
++!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) & MX < 10 <- 
 	move_towards(right).
 
 +!go_right2 <- true.
@@ -169,7 +173,7 @@
 +!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) <-	
 	move_towards(left).
 	
-+!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & MX > 0 <- 
++!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) & MX > 0 <- 
 	move_towards(left).
 
 +!go_left2 <- true.
@@ -177,7 +181,7 @@
 +!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) <-	
 	move_towards(up).
 	
-+!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & MY > 0 <- 
++!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) & MY > 0 <- 
 	move_towards(down).
 
 +!go_up2 <- true.
@@ -185,7 +189,7 @@
 +!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) <-	
 	move_towards(down).
 	
-+!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & MY < 10 <- 
++!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) & MY < 10 <- 
 	move_towards(down).
 
 +!go_down2 <- true.

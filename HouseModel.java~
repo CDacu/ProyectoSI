@@ -28,7 +28,7 @@ public class HouseModel extends GridWorldModel {
     int availableBeers = 3;             // how many beers are available
     int pinchosTortilla = 0;            // how many pinchos de Tortilla are available
     int pinchosEmpanada = 0;            // how many pinchos de Empanada are available
-    int pinchosBocata = 0;               // how many pinchos de Bocata are available
+    int pinchosBocata = 0;              // how many pinchos de Bocata are available
     int cansInBin = 0;                  // how many cans are in the rubbish bin
     int platosEnLavavajillas = 0;       // how many platos are in the Lavavajillas
     int platosEnAlacena = 15;           // how many platos are in the Alacena

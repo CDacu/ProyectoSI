@@ -1,8 +1,12 @@
+// ----------------------- CREENCIAS ROBOT ---------------------------------------------------------------------------//
+
 available(beer,fridge).
 
 limit(beer,7).
 
 tamPackBeer(3).
+
+// ----------------------- FUNCIONES LLEVAR COMIDA AL OWNER ----------------------------------------------------------//
 
 too_much(B) :-
    	.date(YY,MM,DD) &
@@ -16,19 +20,6 @@ too_much(B) :-
 	+healthMsg;
 	!bring(owner,beer).
 
-+reponerCerveza : not enProceso <-
-	.println("Busco reponer cervezas");
-	+enProceso;
-  	!checkSupermarkets;
-   	.wait(500);
-	!checkPrice;
-	.wait(50);
-   	!buySupermarketBeer;
-	-enProceso;
-	-reponerCerveza.
-	
-+reponerCerveza : true <- true.
-	
 +!bring(owner,beer) :  not available(beer,fridge) & available(pincho,fridge) <-
 	.println("Busco reponer cervezas, no quedan");
 	!checkSupermarkets;
@@ -62,11 +53,6 @@ too_much(B) :-
    	!tellTime;
 	!bring(owner,beer).
 
-+!tellTime : true <-
-   	.time(HH,NN,SS);
-   	.concat("La hora es: ", HH,":",NN,":",SS, M);
-   	.send(owner,tell,msg(M)).
-
 +!bring(owner,beer) :  available(beer,fridge) & not too_much(beer) & available(pincho,fridge) & not carringPlato & not preparingPincho & not vaciandoLavavajillas <- 
 	+carringPlato;
 	X = math.round(math.random(200));
@@ -99,7 +85,9 @@ too_much(B) :-
 //-!bring(_,_) <- 
 //	.current_intention(I);
 //	.print("Failed to achieve goal '!has(_,_)'. Current intention is: ",I).	
-	
+
+// ----------------------- FUNCIONES PREPARAR PINCHOS --------------------------------------------------------------------// 
+
 +!prepararPincho(Product) : not carringPlato & not vaciandoLavavajillas <-
 	+preparingPincho;
     !go_at(alacena);
@@ -112,6 +100,8 @@ too_much(B) :-
 +!prepararPincho(Product) <-
 	.wait(100);
 	!prepararPincho(Product).
+
+// ----------------------- FUNCIONES VACIAR LAVAVAJILLAS ------------------------------------------------------------------// 
 	
 +lavavajillasLleno <-
 	!vaciar_lavavajillas.
@@ -130,6 +120,21 @@ too_much(B) :-
 +!vaciar_lavavajillas <-
 	.wait(100);
 	!vaciar_lavavajillas.
+
+// ----------------------- FUNCIONES COMPRA EN EL SUPERMERCADO --------------------------------------------------------------// 	
+
++reponerCerveza : not enProceso <-
+	.println("Busco reponer cervezas");
+	+enProceso;
+  	!checkSupermarkets;
+   	.wait(500);
+	!checkPrice;
+	.wait(50);
+   	!buySupermarketBeer;
+	-enProceso;
+	-reponerCerveza.
+	
++reponerCerveza : true <- true.
 
 +!buySupermarketBeer : favBeer(Marca) & barataF(Product, Marca, Precio, Stock, Super) & money(DineroInicial) & tamPackBeer(Qtd) <-
 	Dinero = DineroInicial;
@@ -200,6 +205,8 @@ too_much(B) :-
 		}
 	}.
 
+// ----------------------- FUNCIONES GESTION DE DINERO --------------------------------------------------------------------// 	
+	
 +!pagar(Precio, Qtd, SuperBarato) : money(Dinero) <-
    Pago = Qtd * Precio;
    DineroActual = Dinero - Pago;
@@ -207,6 +214,8 @@ too_much(B) :-
    +money(DineroActual);
    .send(SuperBarato, achieve, pago(Pago)).
 
+// ----------------------- FUNCIONES GESTION DE STOCK ---------------------------------------------------------------------//   
+   
 +delivered(beer,Marca,Qtd,OrderId) : available(beer,fridge) <- 
 	-delivered(beer,Marca,Qtd,OrderId).
 
@@ -240,8 +249,10 @@ too_much(B) :-
 	}else{
 		+available(pincho,fridge);
 	}
-	-stock(pincho,N).
-
+	-stock(pincho,N).	
+	
+// ----------------------- FUNCIONES COMPROBAR PRECIOS ----------------------------------------------------------------------------- //	
+	
 +!checkSupermarkets <-
 	.abolish(priceBeer(_,_,_,_));
 	.abolish(barataF(_,_,_,_,_));
@@ -297,9 +308,18 @@ too_much(B) :-
 	.min(List, PrecioBarato);
 	?pricePincho(Product, PrecioBarato, Stock)[source(Super)];
 	+masbarato(Product, PrecioBarato, Stock, Super).
-	
+
+// ----------------------- FUNCIONES TELL TIME ------------------------------------------------------------------------------- //
+
++!tellTime : true <-
+   	.time(HH,NN,SS);
+   	.concat("La hora es: ", HH,":",NN,":",SS, M);
+   	.send(owner,tell,msg(M)).
+
 +?time(T) <- time.check(T).
 
+// ----------------------- MOVIMIENTO JASON ---------------------------------------------------------------------------------- //
+	
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).
 
@@ -429,20 +449,32 @@ too_much(B) :-
 	
 +!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) <-	
 	move_towards(right).
+	
++!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) & MX < 10 <- 
+	move_towards(right).
 
 +!go_right2 <- true.
 
 +!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) <-	
+	move_towards(left).
+	
++!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) & MX > 0 <- 
 	move_towards(left).
 
 +!go_left2 <- true.
 
 +!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) <-	
 	move_towards(up).
+	
++!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) & MY > 0 <- 
+	move_towards(down).
 
 +!go_up2 <- true.
 
 +!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) <-	
+	move_towards(down).
+	
++!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) & MY < 10 <- 
 	move_towards(down).
 
 +!go_down2 <- true.

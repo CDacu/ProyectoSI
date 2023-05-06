@@ -1,7 +1,19 @@
+// ----------------------- CREEENCIAS OWNER ----------------------------------------------------------------------------- //
+
 !get(beer).
 !setMoneyRobot(100).
 !setFavBeer(1906).
 !aburrimiento.
+
+// ----------------------- FUNCIONES INCIALES --------------------------------------------------------------------------- //
+
++!setMoneyRobot(Qtd) <-
+   	.send(robot, tell, money(Qtd)).
+
++!setFavBeer(Marca) <-
+   	.send(robot, tell, favBeer(Marca)).
+   
+// ----------------------- FUNCIONES BEBER ------------------------------------------------------------------------------ //
 
 +has(owner,beer) <- 
 	!drink(beer).
@@ -9,14 +21,8 @@
 -has(owner,beer) : not recogiendoLata <- 
 	!get(beer).
 
-+!setMoneyRobot(Qtd) <-
-   .send(robot, tell, money(Qtd)).
-
-+!setFavBeer(Marca) <-
-   .send(robot, tell, favBeer(Marca)).
-
 +!get(beer) : ~couldDrink(beer) <-
-   .println("Owner ha bebido demasiado por hoy.").
+   	.println("Owner ha bebido demasiado por hoy.").
 
 +!get(beer) <-
 	.send(robot, achieve, bring(owner,beer)).
@@ -47,6 +53,8 @@
 	sip(beer);
 	.println("Owner está bebiendo cerveza");
 	!drink(beer).
+	
+// ----------------------- FUNCIONES ABURRIMIENTO ------------------------------------------------------------------------ //
 
 +!aburrimiento <- 
 	.random(X); 
@@ -54,16 +62,20 @@
 	.send(robot, achieve, tellTime);
 	!aburrimiento.
 
+// ----------------------- FUNCIONES RECOGER LATA ----------------------------------------------------------------------- //	
+	
++!recogerLata <-
+   	!go_at(bin);
+	tirarLata;
+	!go_at(ownerchair);
+	-recogiendoLata.
+   
 +msg(M)[source(Ag)]	<- 
 	.print("Message from ",Ag,": ",M);
 	-msg(M)[source(Ag)].
 
-+!recogerLata <-
-   !go_at(bin);
-   tirarLata;
-   !go_at(ownerchair);
-   -recogiendoLata.
-   
+// ----------------------- MOVIMIENTO JASON ---------------------------------------------------------------------------------- //
+	
 +!go_at(Destino) : .my_name(MyName) & position(MyName,MX, MY) & position(Destino, DX, DY) & MX == DX & MY == DY <-
     .println("HE LLEGADO A MI DESTINO ", Destino).
 
@@ -193,20 +205,32 @@
 	
 +!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) <-	
 	move_towards(right).
+	
++!go_right2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX+1, MY) & MX < 10 <- 
+	move_towards(right).
 
 +!go_right2 <- true.
 
 +!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) <-	
+	move_towards(left).
+	
++!go_left2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX-1, MY) & MX > 0 <- 
 	move_towards(left).
 
 +!go_left2 <- true.
 
 +!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) <-	
 	move_towards(up).
+	
++!go_up2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY-1) & MY > 0 <- 
+	move_towards(down).
 
 +!go_up2 <- true.
 
 +!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) <-	
+	move_towards(down).
+	
++!go_down2 : .my_name(MyName) & position(MyName,MX, MY) & not position(obstaculo, MX, MY+1) & MY < 10 <- 
 	move_towards(down).
 
 +!go_down2 <- true.

@@ -98,7 +98,7 @@ public class HouseEnv extends Environment {
 			
 			addPercept(agent, Literal.parseLiteral("position(basurero," + model.getAgPos(2).x + "," + model.getAgPos(2).y + ")"));
 			addPercept(agent, Literal.parseLiteral("position(owner," + model.getAgPos(3).x + "," + model.getAgPos(3).y + ")"));
-			addPercept(agent, Literal.parseLiteral("position(repartidor," + model.getAgPos(6).x + "," + model.getAgPos(6).y + ")"));
+			addPercept(agent, Literal.parseLiteral("position(repartidor," + model.getAgPos(4).x + "," + model.getAgPos(4).y + ")"));
 			
 			for(int i=0; i < 7; i++){
 				addPercept(agent, Literal.parseLiteral("position(obstaculo,"+model.getObstaculoPosX(i)+","+model.getObstaculoPosY(i)+")"));
@@ -187,7 +187,7 @@ public class HouseEnv extends Environment {
             } else if (ag.equals("owner")) {
                 agent = 3;
             } else if (ag.equals("repartidor")) {
-                agent = 6;
+                agent = 4;
             }
 			
             try {

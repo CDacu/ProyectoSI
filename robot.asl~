@@ -37,8 +37,9 @@ too_much(B) :-
 	.wait(50);
 	!buySupermarketBeer.
 
-+!bring(owner,beer) : available(beer,fridge) & not available(pincho,fridge) <-
++!bring(owner,beer) : available(beer,fridge) & not available(pincho,fridge) & not yaPedidoPincho <-
 	.println("Busco reponer pinchos, no quedan");
+	+yaPedidoPincho;
    	siguienteAperitivo;
 	!checkSupermarkets;
 	.wait(500);
@@ -48,30 +49,32 @@ too_much(B) :-
 
 +!bring(owner,beer) : not available(beer,fridge) & not available(pincho,fridge) <-
 	.println("Busco reponer cervezas y pincho, no quedan");
-   siguienteAperitivo;
-   !checkSupermarkets;
-   .wait(500);
-   !checkPrice;
-   .wait(50);
-   !buySupermarketBeer;
-   !buySupermarketPincho.
+	siguienteAperitivo;
+	!checkSupermarkets;
+	.wait(500);
+	!checkPrice;
+	.wait(50);
+	!buySupermarketBeer;
+	!buySupermarketPincho.
 
 +!bring(owner,beer) : too_much(beer) & healthMsg <-
-   .wait(5000);
-   !tellTime;
-   !bring(owner,beer).
+   	.wait(5000);
+   	!tellTime;
+	!bring(owner,beer).
 
 +!tellTime : true <-
    	.time(HH,NN,SS);
    	.concat("La hora es: ", HH,":",NN,":",SS, M);
    	.send(owner,tell,msg(M)).
- 
-+!bring(owner,beer) : carringPlato <- 
-	.wait(100); 
-	!bring(owner,beer).		
 
 +!bring(owner,beer) :  available(beer,fridge) & not too_much(beer) & available(pincho,fridge) & not carringPlato & not preparingPincho & not vaciandoLavavajillas <- 
 	+carringPlato;
+	X = math.round(math.random(200));
+	.wait(X);
+	!traer(owner,beer).
+	
++!traer(owner,beer) : not working <-
+	+working;
 	!go_at(fridge);
 	open(fridge);
 	get(beer);
@@ -83,7 +86,15 @@ too_much(B) :-
 	anadirPlatosLavavajillas(1);
     .date(YY,MM,DD); .time(HH,NN,SS);
     +consumed(YY,MM,DD,HH,NN,SS,beer);
+	-working;
 	-carringPlato.
+
++!traer(owner,beer) <- true.
+
++!bring(owner,beer) <-
+	X = math.round(math.random(200));
+	.wait(X);
+	!bring(owner,beer).
 	
 //-!bring(_,_) <- 
 //	.current_intention(I);
@@ -96,19 +107,29 @@ too_much(B) :-
     !go_at(fridge);
     .wait(1000);
     prepararPincho(Product);
-	-preparingPincho.	
+	-preparingPincho.
+
++!prepararPincho(Product) <-
+	.wait(100);
+	!prepararPincho(Product).
 	
++lavavajillasLleno <-
+	!vaciar_lavavajillas.
 	
-+lavavajillasLleno : not carringPlato & not preparingPincho <-
++!vaciar_lavavajillas : not carringPlato & not preparingPincho <-
 	+vaciandoLavavajillas;
   	!go_at(lavavajillas);
 	.wait(500);
 	vaciar_lavavajillas;
-	!go_at(robot,alacena);
+	!go_at(alacena);
 	.wait(500);
 	anadirPlatosAlacena(5);
 	-vaciandoLavavajillas;
 	-lavavajillasLleno.
+	
++!vaciar_lavavajillas <-
+	.wait(100);
+	!vaciar_lavavajillas.
 
 +!buySupermarketBeer : favBeer(Marca) & barataF(Product, Marca, Precio, Stock, Super) & money(DineroInicial) & tamPackBeer(Qtd) <-
 	Dinero = DineroInicial;
@@ -189,13 +210,18 @@ too_much(B) :-
 +delivered(beer,Marca,Qtd,OrderId) : available(beer,fridge) <- 
 	-delivered(beer,Marca,Qtd,OrderId).
 
-+delivered(beer,Marca,Qtd,OrderId) <- 
++delivered(beer,Marca,Qtd,OrderId) : not carringPlato <- 
 	+available(beer,fridge);
     !bring(owner,beer);
     -delivered(beer,Marca,Qtd,OrderId).
 	
++delivered(beer,Marca,Qtd,OrderId) <- 
+	+available(beer,fridge);
+    -delivered(beer,Marca,Qtd,OrderId).
+	
 +delivered(Aperitivo,Qtd,OrderId) <-
 	!prepararPincho(Aperitivo);
+	-yaPedidoPincho;
     +available(pincho,fridge);
     !bring(owner,beer);
     -delivered(Aperitivo,Qtd,OrderId).
